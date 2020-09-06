@@ -27,6 +27,7 @@ main section {
 
 input {
   font-size: 2rem;
+  padding  : 5px 0;
 
   text-align: center;
 }
@@ -35,17 +36,38 @@ button {
   font-family: 'Kumbh Sans', sans-serif;
   font-size  : 1.25rem;
 
-  margin-top: 20px;
+  margin: 20px 0;
 
   outline      : none;
-  border       : 2px solid rgb(16, 97, 204);
+  border       : 2px solid rgb(216, 127, 26);
   border-radius: 5px;
 
-  padding: 6px 5px 5px 5px;
+  padding: 7px 5px 4px 5px;
 
-  background-color: rgb(46, 144, 235);
+  background-color: rgb(247, 167, 48);
+
+  color: white;
 }
 
 button:hover {
-  background-color: rgb(46, 197, 235);
+  background-color: rgb(247, 203, 83);
+}
+
+button:active {
+  background-color: rgb(216, 127, 26);
+}
+
+button.sub {
+  margin          : 20px;
+  border          : 2px solid rgb(23, 70, 172);
+  background-color: rgb(46, 106, 235);
+}
+
+button.sub:hover {
+  /* border          : 2px solid rgb(23, 70, 172); */
+  background-color: rgb(46, 150, 235);
+}
+
+button.sub:active {
+  background-color: rgb(23, 70, 172);
 }
