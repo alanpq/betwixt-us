@@ -120,6 +120,9 @@ class Vector {
   toObject = function () {
     return { x: this.x, y: this.y };
   };
+
+  static zero = new Vector(0, 0);
+  static one = new Vector(1, 1);
 }
 // TODO: implement normalize, scale, dot
 
