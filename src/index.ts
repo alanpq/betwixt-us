@@ -1,8 +1,13 @@
 import express from 'express'
+import socketio from 'socket.io'
+import http from 'http';
 import path from 'path'
 
 const app = express()
+const server = http.createServer(app);
 const port = process.env.PORT || 80
+
+const io = socketio(server);
 
 import { roomCodes } from './data';
 import Room from './Room';
@@ -44,6 +49,28 @@ app.get('/', (req, res) => {
   res.render('index')
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://0.0.0.0:${port}`)
+app.get('/game', (req, res) => {
+  res.render('game')
+})
+
+// TODO: move this shit elsewhere
+
+const workspaces = io.of(/^\/([A-Z]){4}$/);
+// TODO: look into namespace middlewares
+workspaces.on('connection', socket => {
+  const workspace = socket.nsp;
+  console.log(`user connected to ${workspace.name}`)
+});
+
+// io.on('connection', (socket) => {
+//   console.log('general io connection');
+
+
+//   socket.on('disconnect', () => {
+//     console.log('general io disconnected');
+//   });
+// });
+
+server.listen(port, () => {
+  console.log(`Example app listening at http://127.0.0.1:${port}`)
 })
