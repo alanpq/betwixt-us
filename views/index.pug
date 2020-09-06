@@ -11,5 +11,5 @@ html(lang="en")
     main
       h1 Betwixt Us
       section
-        input(id="room-code", placeholder="Room Code", maxLength=4, pattern="[a-zA-Z]*")
+        input(id="room-code", placeholder="Room Code", required, minLength=4, maxLength=4, pattern="[a-zA-Z]*")
         button(onClick="joinRoom()") Join!
