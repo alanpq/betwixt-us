@@ -1,0 +1,51 @@
+#room-code {
+  text-transform: uppercase;
+}
+
+main {
+  text-align: center;
+
+  display        : flex;
+  flex-direction : column;
+  justify-content: center;
+
+  height: 100%;
+}
+
+h1 {
+  position: absolute;
+  top     : 0;
+  left    : 0;
+  right   : 0;
+}
+
+main section {
+  display       : flex;
+  flex-direction: column;
+  padding       : 25%;
+}
+
+input {
+  font-size: 2rem;
+
+  text-align: center;
+}
+
+button {
+  font-family: 'Kumbh Sans', sans-serif;
+  font-size  : 1.25rem;
+
+  margin-top: 20px;
+
+  outline      : none;
+  border       : 2px solid rgb(16, 97, 204);
+  border-radius: 5px;
+
+  padding: 6px 5px 5px 5px;
+
+  background-color: rgb(46, 144, 235);
+}
+
+button:hover {
+  background-color: rgb(46, 197, 235);
+}

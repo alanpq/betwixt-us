@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Betwixt Us
+    link(rel="stylesheet", href="stylesheet/style.css")
+    link(rel="stylesheet", href="stylesheet/index.css")
+    script(src="javascript/index.js", defer=true)
+  body
+    main
+      h1 Betwixt Us
+      section
+        input(id="room-code", placeholder="Room Code", maxLength=4, pattern="[a-zA-Z]*")
+        button(onClick="joinRoom()") Join!
