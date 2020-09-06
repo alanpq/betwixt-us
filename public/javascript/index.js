@@ -1,7 +1,8 @@
 const dom_roomID = document.getElementById('room-code');
 
 const connect = (code) => {
-  localStorage.setItem('code', code);
+  console.log(`Moving to game room ${code}`)
+  sessionStorage.setItem('code', code);
   window.location = '/game';
 }
 
@@ -11,7 +12,7 @@ const joinRoom = () => {
       .then(
         json => {
           console.log(json)
-          connect(json.code);
+          connect(dom_roomID.value.toUpperCase());
         }
       );
 }

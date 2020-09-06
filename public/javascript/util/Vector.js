@@ -102,6 +102,17 @@ class Vector {
     this.y /= scalar;
   };
 
+  /**
+   * Interpolate between two vectors by a given percentage.
+   * @param {Vector} a First Vector
+   * @param {Vector} b Second Vector
+   * @param {number} t Interpolation Amount
+   */
+  static lerp(a, b, t) {
+    const result = a.add(b.subtract(a).multiply(t));
+    return result;
+  }
+
 
 
   // Utilities

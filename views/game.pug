@@ -2,16 +2,22 @@
 html(lang="en")
   head
     meta(charset="UTF-8")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0, user-scalable=no")
     title Betwixt Us
 
     link(rel="stylesheet", href="stylesheet/style.css")
+    link(rel="manifest", href="manifest.json")
+    link(rel="shortcut icon", href="../images/cheersluka.png", type="image/png")
 
     script(src="/socket.io/socket.io.js")
     script(src="javascript/util/util.js")
     script(src="javascript/util/Vector.js")
+    script(src="javascript/Player.js")
+
+    script(src="javascript/joystick.js", defer)
     script(src="javascript/canvas.js", defer)
     script(src="javascript/game.js", defer)
+
     link(rel="stylesheet", href="stylesheet/game.css")
   body
-    canvas#canvas()
+    canvas#canvas(style="")

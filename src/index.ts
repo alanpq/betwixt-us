@@ -11,6 +11,9 @@ const io = socketio(server);
 
 import { roomCodes } from './data';
 import Room from './Room';
+import { v4 as uuid } from 'uuid';
+
+import Player from './game/IPlayer';
 
 app.use('/', express.static(path.join(__dirname, "..", "public")))
 
@@ -57,9 +60,36 @@ app.get('/game', (req, res) => {
 
 const workspaces = io.of(/^\/([A-Z]){4}$/);
 // TODO: look into namespace middlewares
-workspaces.on('connection', socket => {
+workspaces.on('connection', (socket: socketio.Socket) => {
   const workspace = socket.nsp;
-  console.log(`user connected to ${workspace.name}`)
+  const room: Room = roomCodes[workspace.name.slice(1)]
+  console.log(`user connected to ${room.code}`);
+
+  socket.on('movement update', (id: string, pos: { x: number, y: number }, vel: { x: number, y: number }) => {
+    socket.broadcast.emit('movement update', id, pos, vel);
+  })
+
+  // Create this new player
+  const player: Player = {
+    id: uuid(),
+    pos: { x: 0, y: 0 },
+    velocity: { x: 0, y: 0 },
+    name: Math.random() + "",
+    color: Math.floor(Math.random() * 11),
+  };
+  socket.emit('you', player); // send new player themselves (meta)
+  socket.broadcast.emit('new player', player); // send new player to all existing players
+
+  for (let pl of Object.values(room.players)) { // send all existing players to new player
+    socket.emit('new player', pl);
+  }
+
+  socket.on('disconnect', () => {
+    socket.broadcast.emit('player leave', player.id)
+    delete room.players[player.id]
+  })
+
+  room.players[player.id] = player;
 });
 
 // io.on('connection', (socket) => {
