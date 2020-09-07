@@ -1,0 +1,82 @@
+//// KEYBOARD
+
+const keyState = {};
+
+const getKeyCode = (key) => {
+  return keyState[key] || false;
+}
+
+//// MOUSE/TOUCH
+let mousePos = { x: 0, y: 0 };
+let mouseState = 2; // 0 - held, 1 - just pressed, 2 - released, 3 - just released
+let mouseIsEaten = false; // used for mouse click consuming items (buttons, etc)
+
+/**
+ * Returns true if the left mouse button is currently pressed.
+ * @return {boolean}
+ */
+const GetLeftMouse = () => { // no need for other mouse clicks, we're going for crossplay
+  return mouseState < 2;
+}
+/**
+ * Returns true if the left mouse button has just been pressed.
+ * @return {boolean}
+ */
+const GetLeftMouseDown = () => {
+  return mouseState == 1;
+}
+
+/**
+ * Returns true if the left mouse button has just been released.
+ * @return {boolean}
+ */
+const GetLeftMouseUp = () => {
+  return mouseState == 3;
+}
+
+//// TICK
+
+const inputTick = () => {
+  switch (mouseState) { // TODO: investigate whether this should be after all other ticks or before
+    case 1:
+      mouseState = 0;
+      break;
+    case 3:
+      mouseState = 2;
+      break;
+  }
+}
+
+
+//// EVENT LISTENERS
+
+// KEYBOARD
+window.addEventListener('keydown', (e) => {
+  keyState[e.keyCode] = true;
+})
+
+window.addEventListener('keyup', (e) => {
+  keyState[e.keyCode] = false;
+})
+
+// MOUSE
+window.addEventListener('mousedown', (e) => {
+  mousePos.x = e.clientX;
+  mousePos.y = e.clientY;
+
+  mouseState = 1;
+})
+
+window.addEventListener('mouseup', (e) => {
+  mousePos.x = e.clientX;
+  mousePos.y = e.clientY;
+
+  mouseState = 3;
+})
+
+window.addEventListener('mousemove', (e) => {
+  mousePos.x = e.clientX;
+  mousePos.y = e.clientY;
+});
+
+// TOUCH

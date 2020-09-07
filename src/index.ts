@@ -41,6 +41,7 @@ app.get('/room/:room', (req, res) => {
 
 app.post('/room/create', (req, res) => {
   const room = new Room();
+  if (roomCodes[room.code]) return;
   roomCodes[room.code] = room;
   res.status(200).json({
     status: 200,
@@ -63,33 +64,47 @@ const workspaces = io.of(/^\/([A-Z]){4}$/);
 workspaces.on('connection', (socket: socketio.Socket) => {
   const workspace = socket.nsp;
   const room: Room = roomCodes[workspace.name.slice(1)]
+  if (!room) {
+    socket.emit('kicked', "Room not found");
+    socket.disconnect();
+    return;
+  };
   console.log(`user connected to ${room.code}`);
 
-  socket.on('movement update', (id: string, pos: { x: number, y: number }, vel: { x: number, y: number }) => {
-    socket.broadcast.emit('movement update', id, pos, vel);
-  })
+  socket.on('self register', (name) => {
+    if (!name || !name.match(/^[a-zA-Z0-9! ]*$/) || name.length < 1 || name.length > 10) {
+      socket.emit("kicked", "Bad Username.")
+      console.log(name);
+      socket.disconnect();
+      return;
+    }
+    const playerList = Object.values(room.players);
+    // Create this new player
+    const player: Player = {
+      id: uuid(),
+      pos: { x: 0, y: 0 },
+      velocity: { x: 0, y: 0 },
+      name,
+      host: playerList.length === 0,
+      color: Math.floor(Math.random() * 11),
+    };
+    socket.emit('you', player); // send new player themselves (meta)
+    socket.broadcast.emit('new player', player); // send new player to all existing players
 
-  // Create this new player
-  const player: Player = {
-    id: uuid(),
-    pos: { x: 0, y: 0 },
-    velocity: { x: 0, y: 0 },
-    name: Math.random() + "",
-    color: Math.floor(Math.random() * 11),
-  };
-  socket.emit('you', player); // send new player themselves (meta)
-  socket.broadcast.emit('new player', player); // send new player to all existing players
+    for (let pl of playerList) { // send all existing players to new player
+      socket.emit('new player', pl);
+    }
 
-  for (let pl of Object.values(room.players)) { // send all existing players to new player
-    socket.emit('new player', pl);
-  }
+    socket.on('movement update', (id: string, pos: { x: number, y: number }, vel: { x: number, y: number }) => {
+      socket.broadcast.emit('movement update', id, pos, vel);
+    })
+    socket.on('disconnect', () => {
+      socket.broadcast.emit('player leave', player.id)
+      delete room.players[player.id]
+    })
 
-  socket.on('disconnect', () => {
-    socket.broadcast.emit('player leave', player.id)
-    delete room.players[player.id]
-  })
-
-  room.players[player.id] = player;
+    room.players[player.id] = player;
+  });
 });
 
 // io.on('connection', (socket) => {

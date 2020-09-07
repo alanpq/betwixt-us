@@ -4,4 +4,5 @@ export default interface Player { // FIXME: aRGHHH Server CLIenT DUpliCATED mODA
   velocity: { x: number, y: number },
   name: string,
   color: number,
+  host: boolean
 }

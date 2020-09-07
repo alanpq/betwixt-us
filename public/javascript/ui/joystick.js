@@ -5,14 +5,14 @@ const joystickSize = 40;
 
 window.addEventListener("touchstart", (e) => {
 
-  if (document.fullscreenElement == null) {
+  if (document.fullscreenElement == null)
     document.body.requestFullscreen();
-  }
 
   if (joystickTouchID == null) {
     joystickBase.x = e.changedTouches[0].clientX;
     joystickBase.y = e.changedTouches[0].clientY;
-    joystickTouchID = e.changedTouches[0].identifier;
+    if (joystickBase.x <= W / 2)
+      joystickTouchID = e.changedTouches[0].identifier;
   }
   touchEvent.preventDefault();
 }, false)

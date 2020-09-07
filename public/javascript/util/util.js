@@ -34,7 +34,7 @@ const fillStrokedText = (ctx, text, x, y, maxWidth) => {
 
 // TODO: real colours
 const colors = [
-  "#ffffff",
+  "#abb230",
   "#ff0faa",
   "#fccfff",
   "#faaabf",
