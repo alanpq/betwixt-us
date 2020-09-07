@@ -9,13 +9,7 @@ const isMobile = mobileCheck();
 
 socket.on('connect', () => {
   socket.on('new player', newPlayer => {
-    const player = new Player(); // TODO: put this in player constructor
-    player.host = newPlayer.host;
-    player.id = newPlayer.id;
-    player.pos.x = newPlayer.pos.x;
-    player.pos.y = newPlayer.pos.y;
-    player.name = newPlayer.name;
-    player.color = newPlayer.color;
+    const player = new Player(newPlayer);
     players[player.id] = player;
     playerCount++;
   })
@@ -44,16 +38,50 @@ socket.on('connect', () => {
   })
 
   socket.on('you', (newPlayer) => {
-    locPlayer.host = newPlayer.host;
-    locPlayer.id = newPlayer.id;
-    locPlayer.pos.x = newPlayer.pos.x;
-    locPlayer.pos.y = newPlayer.pos.y;
-    locPlayer.name = newPlayer.name;
-    locPlayer.color = newPlayer.color;
+    locPlayer = new Player(newPlayer);
   })
 
   socket.emit('self register', localStorage.getItem("name"));
 })
+
+
+const gameState = {
+  _score: 0,
+  set score(newScore) {
+    this._score = newScore;
+    // uiDrawScore();
+    scoreUIDraw()
+    console.log(this._score)
+  },
+  get score() {
+    return this._score;
+  },
+
+  updateScore(change) {
+    this._score += change
+    scoreUIDraw()
+  }
+
+}
+
+const gameOptions = {
+  max_score: 100
+}
+
+addObject({
+  pos: new Vector(0, 0),
+  sprite: "box"
+});
+
+addObject({
+  pos: new Vector(100, 133),
+  sprite: "box"
+});
+
+addObject({
+  pos: new Vector(200, 80),
+  sprite: "box"
+});
 
 const playerLayer = playerLayerCanvas.getContext('2d');
 const playerMask = playerMaskCanvas.getContext('2d');
@@ -104,65 +132,73 @@ testImage.src = "../images/test.png";
 const testImage2 = new Image();
 testImage2.src = "../images/cheersluka.png";
 
+const blueNoise = new Image();
+blueNoise.src = "../images/blueNoise.png"
+
+
+
 // TODO: add noise for dithering
-const visibilityGrad = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.min(W, H) * 0.25);
-visibilityGrad.addColorStop(0.5, "transparent");
+const visibilityGrad = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.min(W, H) * 0.35);
+visibilityGrad.addColorStop(0.7, "transparent");
 visibilityGrad.addColorStop(1, "rgba(0,0,0,0.75)");
 
 
-const visibilityGradMask = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.min(W, H) * 0.25);
+const visibilityGradMask = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.min(W, H) * 0.35);
 visibilityGradMask.addColorStop(0.8, "white");
 visibilityGradMask.addColorStop(1, "transparent");
 
+
+
 const draw = (dt) => {
   ctx.clearRect(0, 0, W, H);
-  playerLayer.clearRect(0, 0, W, H);
-  playerMask.clearRect(0, 0, W, H);
+  // playerLayer.clearRect(0, 0, W, H);
 
-  playerMask.globalCompositeOperation = "copy";
-  playerMask.fillStyle = visibilityGradMask;
-  playerMask.fillRect(0, 0, W, H);
-
-  if (document.fullscreenElement == null && isMobile) {
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "white";
-    ctx.font = `${(30 / 355) * W}px Kumbh Sans, sans-serif`;
-    ctx.textAlign = "center";
-    const gap = (20 / 355) * W;
-    ctx.fillText("Tap to go", W / 2, H / 2 - gap);
-    ctx.fillText("Fullscreen", W / 2, H / 2 + gap);
-    return;
-  }
+  // if (document.fullscreenElement == null && isMobile) { // TODO: move to event listener
+  //   ctx.fillStyle = "black";
+  //   ctx.fillRect(0, 0, W, H);
+  //   ctx.fillStyle = "white";
+  //   ctx.font = `${(30 / 355) * W}px Kumbh Sans, sans-serif`;
+  //   ctx.textAlign = "center";
+  //   const gap = (20 / 355) * W;
+  //   ctx.fillText("Tap to go", W / 2, H / 2 - gap);
+  //   ctx.fillText("Fullscreen", W / 2, H / 2 + gap);
+  //   return;
+  // }
 
   // TODO: add camera scale (maybe rotation?!?!?!?) to affine matrix
   ctx.setTransform(1, 0, 0, 1, -camera.x, -camera.y); // apply camera translation to main layer matrix
-  playerLayer.setTransform(1, 0, 0, 1, -camera.x, -camera.y); // apply camera translation to player layer matrix
+  // playerLayer.setTransform(1, 0, 0, 1, -camera.x, -camera.y); // apply camera translation to player layer matrix
   // playerMask.setTransform(1, 0, 0, 1, -camera.x, -camera.y); // apply camera translation to player layer matrix
-
-  ctx.drawImage(testImage, 0, 0);
-  ctx.drawImage(testImage2, 0, 0 + testImage.height);
-
 
   for (let player of Object.values(players)) {
     // ctx.fillRect(playerCanvas, player.pos.x - camera.x, player.pos.y - camera.y, 50, 50);
-    player.draw(playerLayer, camera);
+    player.draw(ctx, playerMask, visibilityGradMask, camera);
   }
-  locPlayer.draw(playerLayer, camera);
+  locPlayer.draw(ctx, playerMask, visibilityGradMask, camera);
 
 
-  playerLayer.setTransform(1, 0, 0, 1, 0, 0); // reset transformation matrix for player layer
+  ctx.drawImage(testImage2, 0, 0 + testImage.height);
+
+  drawScene(ctx, dt);
+
+  // playerLayer.setTransform(1, 0, 0, 1, 0, 0); // reset transformation matrix for player layer
   // playerMask.setTransform(1, 0, 0, 1, 0, 0); // reset transformation matrix for player layer
   ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transformation matrix
 
-  playerMask.globalCompositeOperation = "source-in";
-  playerMask.drawImage(playerLayerCanvas, 0, 0);
-  ctx.drawImage(playerMaskCanvas, 0, 0);
+  //////// DRAW MASKED PLAYER LAYER TO MAIN CANVAS
+  // playerMask.globalCompositeOperation = "source-in";
+  // playerMask.drawImage(playerLayerCanvas, 0, 0);
+  // ctx.drawImage(playerMaskCanvas, 0, 0);
 
-  ctx.fillStyle = visibilityGrad;
-  ctx.fillRect(0, 0, W, H);
+  // ctx.fillStyle = visibilityGrad;
+  // ctx.fillRect(0, 0, W, H);
 
   drawUI(ctx, dt);
+
+  if (scoreDirty)
+    scoreUIDraw(dt);
+
+
   // meetingCalled("000")
 }
 
@@ -172,29 +208,28 @@ setInterval(() => {
     socket.emit('movement update', locPlayer.id, locPlayer.pos, locPlayer.velocity)
 }, 1000 / 64);
 
+scoreUIDraw()
+prev = performance.now()
 
-const meetingHome = [0, 0]
+if (document.fullscreenElement == null && isMobile) { // TODO: move to event listener
+  window.addEventListener('fullscreenchange', (e) => {
+    window.requestAnimationFrame(tick);
+  })
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "white";
+  ctx.font = `${(30 / 355) * W}px Kumbh Sans, sans-serif`;
+  ctx.textAlign = "center";
+  const gap = (20 / 355) * W;
+  ctx.fillText("Tap to go", W / 2, H / 2 - gap);
+  ctx.fillText("Fullscreen", W / 2, H / 2 + gap);
 
-const meetingCalled = (callerID) => {
-  /** @type {Canvas} */
-  const meetingCanvas = document.createElement('canvas')
-  /** @type {CanvasRenderingContext2D}*/
-  const meetingCTX = meetingCanvas.getContext("2d")
-  meetingCanvas.width = W * 0.8
-  meetingCanvas.height = H * 0.8
-  meetingCTX.fillText("meeting time", 0, 0)
-  meetingCTX.fillText(`${callerID}`, 100, 100)
-  ctx.drawImage(meetingCanvas, W * 0.1, H * 0.1)
+} else {
+  window.requestAnimationFrame(tick);
 }
 
-
-
-
-
-
-
-
+scoreUIDraw()
 prev = performance.now()
-window.requestAnimationFrame(tick);
+
 
 

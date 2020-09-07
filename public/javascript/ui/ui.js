@@ -2,6 +2,13 @@ const options = {
   fpsDisplay: 0, // 0 - off, 1 - fps, 2 - full
 }
 
+/** @type {Canvas} */
+const uiCanvas = document.createElement('canvas')
+
+/** @type {CanvasRenderingContext2D} */
+const uiCtx = uiCanvas.getContext('2d')
+
+
 // Framerate Variables
 let frameTimeSum = 0;
 let frameTimeMin = 10000;
@@ -74,5 +81,43 @@ const drawUI = (ctx, dt) => {
 
   // ctx.fillText(["held", "down", "unheld", "up"][mouseState], W / 2, 100);
 
-  drawJoystick(ctx, dt);
+
+  // TODO need a better human to debug this
+  // ctx.drawImage(randomUiFunc(), 0, 0)
+  ctx.drawImage(scoreCanvas, 0, 0)
+  // joystick goes main layer
+  // drawJoystick(ctx, dt);
+}
+
+const randomUiFunc = () => {
+  // ui components are dont move and stay in their seperate areas, when they update the space they takeup is cleared
+  uiCtx.fillStyle = "white"
+  let epic = drawButton(ctx, "call meting", W / 2, H - 130, 250, 80, 0.5, 1)
+  return uiCanvas
+}
+
+/** @type {Canvas} */
+let scoreCanvas = document.createElement('canvas')
+scoreCanvas.width = 300
+scoreCanvas.height = 200
+
+/** @type {CanvasRenderingContext2D} */
+let scoreCtx = scoreCanvas.getContext('2d')
+let curScoreAmnt = 0;
+let scoreDirty = false;
+
+const scoreUIDraw = (dt) => {
+
+  scoreCtx.fillStyle = "white"
+  scoreCtx.fillRect(0, 0, 20, 200)
+  scoreCtx.fillRect(280, 0, 20, 200)
+  scoreCtx.stroke()
+  scoreCtx.fillStyle = "green"
+  scoreCtx.fillRect(20, 70, (curScoreAmnt / gameOptions.max_score) * 260, 60)
+
+  if (dt) {
+    curScoreAmnt = lerp(curScoreAmnt, gameState.score, 20 * dt);
+    if (gameState.score - curScoreAmnt <= EPSILON) scoreDirty = false;
+  } else
+    scoreDirty = true;
 }
