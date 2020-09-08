@@ -1,9 +1,21 @@
+import * as twgl from '../javascript/lib/twgl-full.module.js'
+import { sprites, drawSprite, getSprite } from './sprite.js';
+import { Vector } from './util/Vector.js'
+import { gl } from './render.js'
+import { colors } from './util/util.js'
+
+
+let sprite;
+(async () => {
+  sprite = await getSprite(gl, "ball")
+})()
+
 /**
  * @typedef {Object} Player
  * @property {Vector} position
  * @property {Vector} velocity
  */
-class Player {
+export default class Player {
 
   constructor(basePlayer) {
     if (basePlayer) {
@@ -14,7 +26,7 @@ class Player {
       this.host = basePlayer.host || false;
 
       this.name = basePlayer.name || "";
-      this.color = basePlayer.color || 0;
+      this.color = basePlayer.color % colors.length || 0;
     } else {
       this.id = "";
       this.pos = new Vector(0, 0);
@@ -25,6 +37,10 @@ class Player {
       this.name = "";
       this.color = 0;
     }
+    console.log(
+      `Player ${this.name}${this.host ? ' (host)' : ''}:
+      ID - ${this.id}
+      Color - ${this.color}`)
   }
 
   _drawCharacter(ctx, camera) {
@@ -44,19 +60,23 @@ class Player {
     ctx.shadowBlur = 0;
   }
 
-  draw(ctx, playerMask, visibilityGradMask, camera) {
-    playerMask.clearRect(0, 0, W, H);
-    playerLayer.clearRect(0, 0, W, H);
+  async draw(gl, camera) {
+    // const uniforms = {
+    //   matrix: twgl.m4.identity(),
+    //   tint: [1, 1, 0, 1]
+    // };
 
-    playerMask.globalCompositeOperation = "source-over";
-    playerMask.fillStyle = visibilityGradMask;
-    playerMask.fillRect(0, 0, W, H);
+    // // console.log(10 - (this.pos.y / 100))
+    // // twgl.m4.perspective(Math.PI, gl.canvas.width / gl.canvas.height, 0.1, 100, uniforms.matrix);
+    // twgl.m4.ortho(0, gl.canvas.width / camera.zoom, gl.canvas.height / camera.zoom, 0, -100, 100, uniforms.matrix);
+    // twgl.m4.translate(uniforms.matrix, [this.pos.x - camera.pos.x, 5.5, this.pos.y * 10], uniforms.matrix)
+    // // twgl.m4.scale(uniforms.matrix, [1, 1, 1], uniforms.matrix)
 
-    this._drawCharacter(playerLayer, camera);
-
-    playerMask.globalCompositeOperation = "source-in";
-    playerMask.drawImage(playerLayerCanvas, 0, 0);
-
-    ctx.drawImage(playerMaskCanvas, camera.x, camera.y);
+    // gl.useProgram(programInfo.program)
+    // twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+    // twgl.setUniforms(programInfo, uniforms);
+    // twgl.drawBufferInfo(gl, bufferInfo, gl.TRIANGLES);
+    drawSprite(gl, sprite, this.pos, true, colors[this.color])
   }
 }
+

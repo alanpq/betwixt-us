@@ -1,8 +1,12 @@
+import { Vector } from './util/Vector.js'
+
 //// KEYBOARD
 
-const keyState = {};
+export const keyState = {};
 
-const getKeyCode = (key) => {
+export const joystick = new Vector(0, 0);
+
+export const getKeyCode = (key) => {
   return keyState[key] || false;
 }
 
@@ -15,14 +19,14 @@ let mouseIsEaten = false; // used for mouse click consuming items (buttons, etc)
  * Returns true if the left mouse button is currently pressed.
  * @return {boolean}
  */
-const GetLeftMouse = () => { // no need for other mouse clicks, we're going for crossplay
+export const GetLeftMouse = () => { // no need for other mouse clicks, we're going for crossplay
   return mouseState < 2;
 }
 /**
  * Returns true if the left mouse button has just been pressed.
  * @return {boolean}
  */
-const GetLeftMouseDown = () => {
+export const GetLeftMouseDown = () => {
   return mouseState == 1;
 }
 
@@ -30,13 +34,13 @@ const GetLeftMouseDown = () => {
  * Returns true if the left mouse button has just been released.
  * @return {boolean}
  */
-const GetLeftMouseUp = () => {
+export const GetLeftMouseUp = () => {
   return mouseState == 3;
 }
 
 //// TICK
 
-const inputTick = () => {
+export const inputTick = () => {
   switch (mouseState) { // TODO: investigate whether this should be after all other ticks or before
     case 1:
       mouseState = 0;

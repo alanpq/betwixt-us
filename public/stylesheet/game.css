@@ -3,5 +3,22 @@
 }
 
 canvas {
-  background-color: rgb(131, 131, 131);
+  position        : absolute;
+  top             : 0;
+  left            : 0;
+  background-color: transparent;
+}
+
+#joystick,
+#joystickBase {
+  width : 50px;
+  height: 50px;
+
+  position: absolute;
+  display : none;
+
+  background-color: rgba(66, 76, 91, 0.5);
+  border-radius   : 50%;
+
+  z-index: 100;
 }

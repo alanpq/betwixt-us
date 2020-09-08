@@ -1,7 +1,19 @@
+import { drawSprite, getSprite } from "../sprite.js";
+
+import { gl, m4, loadShader, camera } from '../render.js'
+import { joystick } from '../input.js'
+
+import { Vector } from '../util/Vector.js'
+import { canvas, overlayCanvas, W, H } from '../canvas.js'
+
 let joystickTouchID = null;
-let joystick = new Vector();
+// export let joystick = new Vector();
+/**
+ * @type {Vector}
+ */
 const joystickBase = new Vector();
-const joystickSize = 40;
+export let joystickSize = 40;
+let realSize = 0;
 
 window.addEventListener("touchstart", (e) => {
 
@@ -11,22 +23,37 @@ window.addEventListener("touchstart", (e) => {
   if (joystickTouchID == null) {
     joystickBase.x = e.changedTouches[0].clientX;
     joystickBase.y = e.changedTouches[0].clientY;
-    if (joystickBase.x <= W / 2)
-      joystickTouchID = e.changedTouches[0].identifier;
+    // if (joystickBase.x <= W / 2)
+    joystickTouchID = e.changedTouches[0].identifier;
+
+    realSize = (joystickSize * (W / 355));
+
+    dom_joystickBase.style.display = dom_joystick.style.display = 'inline';
+    dom_joystickBase.style.left = (joystickBase.x - realSize / 2) + 'px';
+    dom_joystickBase.style.top = (joystickBase.y - realSize / 2) + 'px';
+
+    dom_joystick.style.left = (joystickBase.x - realSize * 0.4 / 2) + 'px';
+    dom_joystick.style.top = (joystickBase.y - realSize * 0.4 / 2) + 'px';
+
+    dom_joystickBase.style.width = dom_joystickBase.style.height = realSize + 'px';
+    dom_joystick.style.width = dom_joystick.style.height = (realSize * 0.4) + 'px';
+
   }
-  touchEvent.preventDefault();
+  e.preventDefault();
 }, false)
 
 window.addEventListener("touchmove", (e) => {
   for (let touch of e.changedTouches) {
     if (touch.identifier == joystickTouchID) {
-      joystick.x = (touch.clientX - joystickBase.x) / (joystickSize * (W / 355));
-      joystick.y = (touch.clientY - joystickBase.y) / (joystickSize * (W / 355));
+      joystick.x = (touch.clientX - joystickBase.x) / realSize;
+      joystick.y = (touch.clientY - joystickBase.y) / realSize;
       if (joystick.getMagnitude() > 1)
         joystick.setMagnitude(1);
+      dom_joystick.style.left = ((joystickBase.x + joystick.x * realSize * 0.5) - realSize * 0.4 / 2) + 'px';
+      dom_joystick.style.top = ((joystickBase.y + joystick.y * realSize * 0.5) - realSize * 0.4 / 2) + 'px';
     }
   }
-  touchEvent.preventDefault();
+  e.preventDefault();
 }, canvas)
 
 window.addEventListener("touchend", (e) => {
@@ -34,31 +61,61 @@ window.addEventListener("touchend", (e) => {
     joystick.x = 0;
     joystick.y = 0;
     joystickTouchID = null;
+    dom_joystickBase.style.display = 'none';
+    dom_joystick.style.display = 'none';
   }
-  touchEvent.preventDefault();
+  e.preventDefault();
 })
+
+const dom_joystick = document.getElementById("joystick");
+const dom_joystickBase = document.getElementById("joystickBase");
 
 /**
  * Draws the joystick
- * @param {CanvasRenderingContext2D} ctx 
- * @param {number} dt 
+ * @param {WebGLRenderingContext} gl
+ * @param {number} dt
  */
-const drawJoystick = (ctx, dt) => {
-  if (joystickTouchID != null) {
-    ctx.fillStyle = "rgba(66,76,91,0.5)";
-    ctx.beginPath();
-    ctx.arc(joystickBase.x, joystickBase.y,
-      (joystickSize * (W / 355)),
-      0, 2 * Math.PI);
-    ctx.fill();
-    ctx.fillStyle = "rgba(66,76,91,0.75)";
+export const drawJoystick = async (dt) => {
+  if (joystickTouchID != null || true) {
+    // drawSprite(gl, await getSprite(gl, "box"), joystickBase, false, [66 / 255, 76 / 255, 91 / 255, 1]);
+    // drawSprite(gl, await getSprite(gl, "box"), joystickBase, false, [66 / 255, 76 / 255, 91 / 255, 1]);
+    // ctx.arc(joystickBase.x, joystickBase.y,
+    //   (joystickSize * (W / 355)),
+    //   0, 2 * Math.PI);
+    // ctx.fill();
+    // [66, 76, 91, 0.75]
 
-    ctx.beginPath();
-    ctx.arc(
-      joystickBase.x + (joystick.x * (joystickSize * (W / 355))),
-      joystickBase.y + (joystick.y * (joystickSize * (W / 355))),
-      (joystickSize * (W / 355)) * 0.40,
-      0, 2 * Math.PI);
-    ctx.fill();
+    // ctx.beginPath();
+    // ctx.arc(
+    //   joystickBase.x + (joystick.x * (joystickSize * (W / 355))),
+    //   joystickBase.y + (joystick.y * (joystickSize * (W / 355))),
+    //   (joystickSize * (W / 355)) * 0.40,
+    //   0, 2 * Math.PI);
+    // ctx.fill();
   }
 }
+
+/**
+ * Draws the joystick
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {number} dt
+ */
+// export const drawJoystick = (ctx, dt) => {
+//   if (joystickTouchID != null) {
+//     ctx.fillStyle = "rgba(66,76,91,0.5)";
+//     ctx.beginPath();
+//     ctx.arc(joystickBase.x, joystickBase.y,
+//       (joystickSize * (W / 355)),
+//       0, 2 * Math.PI);
+//     ctx.fill();
+//     ctx.fillStyle = "rgba(66,76,91,0.75)";
+
+//     ctx.beginPath();
+//     ctx.arc(
+//       joystickBase.x + (joystick.x * (joystickSize * (W / 355))),
+//       joystickBase.y + (joystick.y * (joystickSize * (W / 355))),
+//       (joystickSize * (W / 355)) * 0.40,
+//       0, 2 * Math.PI);
+//     ctx.fill();
+//   }
+// }

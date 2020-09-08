@@ -1,16 +1,22 @@
-const canvas = document.getElementById("canvas");
-const playerLayerCanvas = document.createElement("canvas");
-const playerMaskCanvas = document.createElement("canvas");
+import { debounce } from './util/util.js'
+import { camera } from './render.js';
+import { baseVisibility, gameOptions, gameState } from './state.js'
 
-var W, H;
+/** @type {HTMLCanvasElement} */
+export const canvas = document.getElementById("canvas");
+/** @type {HTMLCanvasElement} */
+export const overlayCanvas = document.getElementById("overlayCanvas");
+
+export var W, H;
 var WSF, HSF;
 const resizeCanvas = () => {
-  W = canvas.width = playerMaskCanvas.width = playerLayerCanvas.width = (window.innerWidth || document.body.clientWidth);
-  H = canvas.height = playerMaskCanvas.height = playerLayerCanvas.height = (window.innerHeight || document.body.clientHeight);
+  W = canvas.width = overlayCanvas.width = (window.innerWidth || document.body.clientWidth);
+  H = canvas.height = overlayCanvas.height = (window.innerHeight || document.body.clientHeight);
   WSF = W / 355;
   HSF = H / 600;
+  camera.zoom = (Math.min(W, H) * 0.45) / (baseVisibility * gameOptions.crew_visibility);
 }
 resizeCanvas();
 
 window.addEventListener('resize', debounce(resizeCanvas, 100));
-window.addEventListener('fullscreenchange', debounce(resizeCanvas, 1000));
+window.addEventListener('fullscreenchange', debounce(resizeCanvas, 500));

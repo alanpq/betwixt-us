@@ -1,0 +1,25 @@
+export const gameState = {
+  _score: 0,
+  set score(newScore) {
+    this._score = newScore;
+    // uiDrawScore();
+    // scoreUIDraw()
+    console.log(this._score)
+  },
+  get score() {
+    return this._score;
+  },
+
+  updateScore(change) {
+    this._score += change
+    // scoreUIDraw()
+  }
+
+}
+
+export const baseVisibility = 8;
+
+export const gameOptions = {
+  max_score: 100,
+  crew_visibility: 1,
+}

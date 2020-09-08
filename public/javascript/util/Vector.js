@@ -1,4 +1,4 @@
-class Vector {
+export class Vector {
   /**
    * Create a vector.
    * @param {number} x 
