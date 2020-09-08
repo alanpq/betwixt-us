@@ -1,12 +1,10 @@
-const options = {
-  fpsDisplay: 0, // 0 - off, 1 - fps, 2 - full
+import { fillStrokedText } from '../util/util.js'
+import { canvas, overlayCanvas, W, H } from '../canvas.js'
+import { drawButton } from './button.js'
+
+export const options = {
+  fpsDisplay: 2, // 0 - off, 1 - fps, 2 - full
 }
-
-/** @type {Canvas} */
-const uiCanvas = document.createElement('canvas')
-
-/** @type {CanvasRenderingContext2D} */
-const uiCtx = uiCanvas.getContext('2d')
 
 
 // Framerate Variables
@@ -17,7 +15,7 @@ let frameTimeI = 0;
 let frameTimeSamples = new Array(99);
 const frameTimeSampleCount = 100;
 
-const tickUI = (dt) => {
+export const tickUI = (dt) => {
   if (options.fpsDisplay > 0) {
     frameTimeSum -= frameTimeSamples[frameTimeI] || 0;
     frameTimeSamples[frameTimeI] = dt;
@@ -28,7 +26,8 @@ const tickUI = (dt) => {
   }
 }
 
-const drawUI = (ctx, dt) => {
+export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.font = "20px monospace";
   ctx.fillStyle = "white";
   ctx.strokeStyle = "black";
@@ -84,7 +83,7 @@ const drawUI = (ctx, dt) => {
 
   // TODO need a better human to debug this
   // ctx.drawImage(randomUiFunc(), 0, 0)
-  ctx.drawImage(scoreCanvas, 0, 0)
+  // ctx.drawImage(scoreCanvas, 0, 0)
   // joystick goes main layer
   // drawJoystick(ctx, dt);
 }
@@ -97,27 +96,27 @@ const randomUiFunc = () => {
 }
 
 /** @type {Canvas} */
-let scoreCanvas = document.createElement('canvas')
-scoreCanvas.width = 300
-scoreCanvas.height = 200
+// let scoreCanvas = document.createElement('canvas')
+// scoreCanvas.width = 300
+// scoreCanvas.height = 200
 
-/** @type {CanvasRenderingContext2D} */
-let scoreCtx = scoreCanvas.getContext('2d')
-let curScoreAmnt = 0;
-let scoreDirty = false;
+// /** @type {CanvasRenderingContext2D} */
+// let scoreCtx = scoreCanvas.getContext('2d')
+// let curScoreAmnt = 0;
+// let scoreDirty = false;
 
-const scoreUIDraw = (dt) => {
+// const scoreUIDraw = (dt) => {
 
-  scoreCtx.fillStyle = "white"
-  scoreCtx.fillRect(0, 0, 20, 200)
-  scoreCtx.fillRect(280, 0, 20, 200)
-  scoreCtx.stroke()
-  scoreCtx.fillStyle = "green"
-  scoreCtx.fillRect(20, 70, (curScoreAmnt / gameOptions.max_score) * 260, 60)
+//   scoreCtx.fillStyle = "white"
+//   scoreCtx.fillRect(0, 0, 20, 200)
+//   scoreCtx.fillRect(280, 0, 20, 200)
+//   scoreCtx.stroke()
+//   scoreCtx.fillStyle = "green"
+//   scoreCtx.fillRect(20, 70, (curScoreAmnt / gameOptions.max_score) * 260, 60)
 
-  if (dt) {
-    curScoreAmnt = lerp(curScoreAmnt, gameState.score, 20 * dt);
-    if (gameState.score - curScoreAmnt <= EPSILON) scoreDirty = false;
-  } else
-    scoreDirty = true;
-}
+//   if (dt) {
+//     curScoreAmnt = lerp(curScoreAmnt, gameState.score, 20 * dt);
+//     if (gameState.score - curScoreAmnt <= EPSILON) scoreDirty = false;
+//   } else
+//     scoreDirty = true;
+// }

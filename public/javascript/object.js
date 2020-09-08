@@ -25,7 +25,7 @@ export const gameObjects = [];
 export const addObject = async (gl, object) => {
   object._sprite = await sprite.getSprite(gl, object.sprite);
   object.id = gameObjects.length;
-  recalculateBounds(object);
+  // recalculateBounds(object);
   gameObjects.push(object);
   return object;
 }
@@ -56,9 +56,9 @@ export const drawScene = (gl, camera) => {
     // console.log(object);
     // ctx.drawImage(object._sprite, object.pos.x, object.pos.y);
     sprite.drawSprite(gl, object._sprite, object.pos, true)
-    ctx.fillStyle = "rgba(0,0,0,0.1)"
-    ctx.lineWidth = 0.01
-    ctx.strokeRect(object.pos.x + object.bounds.x, object.pos.y + object.bounds.y, object.bounds.w, object.bounds.h);
+    // ctx.fillStyle = "rgba(0,0,0,0.1)"
+    // ctx.lineWidth = 0.01
+    // ctx.strokeRect(object.pos.x + object.bounds.x, object.pos.y + object.bounds.y, object.bounds.w, object.bounds.h);
 
     // ctx.fillRect(object.pos.x * gl.canvas.width)
   }

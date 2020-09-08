@@ -2,9 +2,9 @@ import * as twgl from './lib/twgl-full.module.js'
 import Player from './Player.js'
 import * as input from './input.js'
 import { addObject, drawScene, gameObjects, instantiate, recalculateBounds } from './object.js'
-import { gl, m4, camera, ctx } from './render.js'
+import { gl, m4, camera, ctx, loadShader } from './render.js'
 
-import { solidProgramInfo, drawSprite, getSprite } from './sprite.js'
+import { solidProgramInfo, drawSprite, getSprite, drawTex } from './sprite.js'
 
 import * as joystick from './ui/joystick.js'
 import { Vector } from './util/Vector.js'
@@ -13,6 +13,7 @@ import { canvas, overlayCanvas, W, H } from './canvas.js'
 
 import { baseVisibility, gameOptions, gameState } from './state.js'
 
+import { drawUI, tickUI } from './ui/ui.js'
 // twgl.setDefaults({ attribPrefix: "a_" });
 
 /** @type {SocketIO.Socket} */
@@ -60,17 +61,35 @@ socket.on('connect', () => {
 
 addObject(gl, {
   pos: new Vector(0, 0),
-  sprite: "box"
+  sprite: "box",
+  bounds: {
+    x: -1.7 / 2,
+    y: -0.25,
+    w: 1.7,
+    h: 1,
+  }
 });
 
 addObject(gl, {
   pos: new Vector(3, 2),
-  sprite: "box"
+  sprite: "box",
+  bounds: {
+    x: -1.7 / 2,
+    y: -0.25,
+    w: 1.7,
+    h: 1,
+  }
 });
 
 addObject(gl, {
   pos: new Vector(1, 7),
-  sprite: "box"
+  sprite: "box",
+  bounds: {
+    x: -1.7 / 2,
+    y: -0.25,
+    w: 1.7,
+    h: 1,
+  }
 });
 
 /** @type {{[id: string] : Player}} */
@@ -87,7 +106,7 @@ const tick = (now) => {
 
   // camera.zoom = (Math.min(W, H) / Math.max(W, H)) * 0.05;
 
-  // tickUI();
+  tickUI(dt);
 
   // if (document.fullscreenElement == null && isMobile) {
   //   draw(dt);
@@ -120,13 +139,18 @@ const tex = twgl.createTexture(gl, {
   target: gl.TEXTURE_2D
 });
 
+let visibilityShader;
+(async () => {
+  visibilityShader = twgl.createProgramInfo(gl, [await loadShader("vertex"), await loadShader("f_visibility")])
+})()
+
+
+
 // AA
 if (!isMobile) {
   gl.enable(gl.SAMPLE_COVERAGE);
   gl.sampleCoverage(4, false);
 }
-// gl.depthMask(true);
-
 
 gl.depthFunc(gl.LEQUAL);
 // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
@@ -137,16 +161,6 @@ gl.enable(gl.BLEND);
 gl.enable(gl.DEPTH_TEST);
 gl.enable(gl.STENCIL_TEST);
 // gl.enable(gl.CULL_FACE);
-
-
-/*
-560 - diam
-280 - radius
-280 / 8 = 35
-pxRadius / visibility = zoom
-
-*/
-
 /** @param {Vector} line */
 const line = (line, arrays, object) => {
   line.subtractFrom(locPlayer.pos)
@@ -194,11 +208,6 @@ const drawVisibility = () => { // TODO: convex polygons?
         1, 3, 2,
       ]
     }
-
-    // const a = object.pos.add(points[0]).subtract(locPlayer.pos);
-    // const b = object.pos.add(points[1]).subtract(locPlayer.pos);
-    // const c = object.pos.add(points[2]).subtract(locPlayer.pos);
-    // const d = object.pos.add(points[3]).subtract(locPlayer.pos);
     let did0, did1, did2, did3;
 
     if (locPlayer.pos.y >= points[0].y || locPlayer.pos.x >= points[0].x)
@@ -264,13 +273,17 @@ const drawVisibility = () => { // TODO: convex polygons?
 
 const draw = async (dt) => {
   ctx.clearRect(0, 0, W, H)
-  ctx.fillStyle = "black"
-  ctx.fillText(locPlayer.pos, 10, 10);
-  ctx.fillText(camera.zoom, 10, 20);
-  ctx.fillText((camera.zoom / gl.canvas.width) / 2, 10, 30);
+  ctx.fillStyle = "white"
+  ctx.font = "11px monospace"
+  ctx.textAlign = "right"
+  ctx.fillText(locPlayer.pos, W - 10, 10);
+  ctx.fillText(camera.zoom, W - 10, 20);
+  ctx.fillText((camera.zoom / gl.canvas.width) / 2, W - 10, 30);
   // ctx.fillText(, 10, 40);
   ctx.setTransform(camera.zoom, 0, 0, camera.zoom, -camera.pos.x * camera.zoom, -camera.pos.y * camera.zoom);
 
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 0.01;
   ctx.beginPath();
   ctx.arc(locPlayer.pos.x, locPlayer.pos.y, baseVisibility, 0, Math.PI * 2);
   ctx.stroke();
@@ -292,21 +305,43 @@ const draw = async (dt) => {
   gl.stencilMask(0xff); // write to stencil buffer
   gl.depthMask(false); // dont write to depth buffer
   gl.disable(gl.DEPTH_TEST);
-  // gl.colorMask(false, false, false, false); // dont write to color buffer
+  gl.colorMask(false, false, false, false); // dont write to color buffer
   drawVisibility();
 
   gl.stencilMask(0); // dont write to stencil buffer
   gl.colorMask(true, true, true, true); // write to color buffer
   gl.depthMask(true); // write to depth buffer
   gl.enable(gl.DEPTH_TEST);
-  gl.stencilFunc(gl.NOTEQUAL, 1, 0xff); // pass stencil if stencil == 1
+  gl.stencilFunc(gl.NOTEQUAL, 1, 0xff); // pass stencil if stencil != 1
 
   for (let player of Object.values(players)) {
     player.draw(gl); // TODO: fix these params
   }
+
+  gl.stencilFunc(gl.EQUAL, 1, 0xff);
+  gl.depthMask(false); // dont write to depth buffer
+  drawSprite(gl, await getSprite(gl, "pixel"), locPlayer.pos, true, [0, 0, 0, 0.9], camera.W)
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.stencilFunc(gl.ALWAYS, 1, 0xff); // ignore stencil buffer (always pass)
+  gl.depthMask(true); // write to depth buffer
+
+
   locPlayer.draw(gl);
 
+  gl.stencilFunc(gl.NOTEQUAL, 1, 0xff); // pass stencil if stencil == 1
+  gl.depthMask(false); // dont write to depth buffer
+  drawTex(gl, await getSprite(gl, "pixel"), {
+    x: locPlayer.pos.x,
+    y: locPlayer.pos.y,
+    z: -50,
+  }, camera.pos, camera.W, visibilityShader, {
+    u_lightPosition: [W / 2, H / 2],
+    u_radius: baseVisibility * camera.zoom,
+    u_tint: [0, 0, 0, 0.9],
+  })
   gl.stencilFunc(gl.ALWAYS, 1, 0xff); // ignore stencil buffer (always pass)
+  gl.depthMask(true); // write to depth buffer
 
   // drawSprite(gl, await getSprite(gl, "pixel"), locPlayer.pos, true, [1, 1, 1, 1], baseVisibility);
 
@@ -316,6 +351,7 @@ const draw = async (dt) => {
   drawScene(gl, camera);
   joystick.drawJoystick();
 
+  drawUI(ctx, dt, socket, playerCount, locPlayer);
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 }

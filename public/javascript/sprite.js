@@ -35,43 +35,43 @@ export const getSprite = (gl, spriteName) => {
   }
 }
 
-export const drawSprite = (gl, sprite, pos, worldSpace = false, tint = [1, 1, 1, 1], scale = 1) => {
-  if (!spriteShader || !sprite || !pos) return;
-  const uniforms = {
-    u_matrix: twgl.m4.identity(),
-    u_texture: sprite,
-    // textureMatrix: twgl.m4.scale(twgl.m4.identity(), [0.5, 0.5]),
-    u_tint: tint
-  };
+export const drawTex = (gl, tex, pos, cameraOff, scale = 1, shader, uniforms = {}) => {
+  if (!shader || !tex || !pos) return;
 
 
-  // const eye = [Math.sin(time * 3) * 10, 4, Math.cos(time * 3) * 10];
   const eye = [0, 0, -1];
   const target = [0, 0, 0];
   const up = [0, 1, 0];
 
-  const fov = 40 * Math.PI / 180;
-  const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
-  const zNear = 1;
-  const zFar = 500;
-  // const projection = twgl.m4.perspective(fov, aspect, zNear, zFar);
-
   const projection = twgl.m4.ortho(0, gl.canvas.width / camera.zoom, gl.canvas.height / camera.zoom, 0, -100, 100);
   // twgl.m4.rotateY(projection, time, projection);
-  if (worldSpace)
-    twgl.m4.translate(projection, [-camera.pos.x, -camera.pos.y, 0], projection);
+  twgl.m4.translate(projection, [-cameraOff.x, -cameraOff.y, 0], projection);
   const ca = twgl.m4.lookAt(eye, target, up);
   const view = twgl.m4.inverse(ca);
   const viewProjection = twgl.m4.multiply(projection, view);
 
-  const world = twgl.m4.translation([-pos.x, pos.y, -pos.y])
+  const world = twgl.m4.translation([-pos.x, pos.y, pos.z])
   // twgl.m4.rotateY(world, time * 5, world))
 
   uniforms.u_matrix = twgl.m4.multiply(viewProjection, world)
+  uniforms.u_texture = tex;
   twgl.m4.scale(uniforms.u_matrix, [scale, scale, 1], uniforms.u_matrix)
-
-  gl.useProgram(spriteShader.program)
-  twgl.setBuffersAndAttributes(gl, spriteShader, quadBufferInfo);
-  twgl.setUniforms(spriteShader, uniforms);
+  gl.useProgram(shader.program)
+  twgl.setBuffersAndAttributes(gl, shader, quadBufferInfo);
+  twgl.setUniforms(shader, uniforms);
   twgl.drawBufferInfo(gl, quadBufferInfo);
+}
+
+export const drawSprite = (gl, sprite, pos, worldSpace = false, tint = [1, 1, 1, 1], scale = 1, customShader = null, customUniforms = {}) => {
+  if (!spriteShader || !sprite || !pos) return;
+  const uniforms = {
+    u_tint: tint,
+    ...customUniforms
+  };
+
+  drawTex(gl, sprite, {
+    x: pos.x,
+    y: pos.y,
+    z: -pos.y,
+  }, camera.pos, scale, customShader || spriteShader, uniforms);
 }

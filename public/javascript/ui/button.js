@@ -10,7 +10,7 @@
  * @param {number} anchorY Y position of anchor point [0-1]
  * @returns {boolean} Whether the button has been pressed.
  */
-const drawButton = (ctx, text, x, y, w, h, anchorX = 0, anchorY = 0, disabled = false) => {
+export const drawButton = (ctx, text, x, y, w, h, anchorX = 0, anchorY = 0, disabled = false) => {
   const bb = {
     x: x - (w * anchorX),
     y: y - (h * anchorY)

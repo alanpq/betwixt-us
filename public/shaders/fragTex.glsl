@@ -9,5 +9,5 @@ uniform vec4 u_tint;
 void main() {
   vec4 tex = texture2D(u_texture, v_texcoord);
   if(tex.a < 0.95) discard;
-  gl_FragColor = vec4(tex.rgb * u_tint.rgb, tex.a) * tex.a;
+  gl_FragColor = vec4(tex.rgb * u_tint.rgb, tex.a * u_tint.a) * tex.a * u_tint.a;
 }
