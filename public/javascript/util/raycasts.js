@@ -1,4 +1,4 @@
-import { Vector } from "./Vector";
+import { Vector } from "./Vector.js";
 
 export class Ray {
   /**
@@ -34,7 +34,7 @@ export const lineIntersect = (a1, a2, b1, b2) => {
   if (abDot == 1)
     return false;
 
-  const c = b1 - a1;
+  const c = b1.subtract(a1);
   const t = c.dotProduct(b) / abDot;
   if (t < 0 || t > 1)
     return false;
@@ -43,7 +43,7 @@ export const lineIntersect = (a1, a2, b1, b2) => {
   if (u < 0 || u > 1)
     return false;
 
-  return a1 + t * a;
+  return a1.add(a.multiply(t));
 }
 
 /**
