@@ -20,7 +20,7 @@ export const locPlayerColl = (locPlayer, prevPos) => {
       if (locPlayer.pos.y > obj.pos.y + obj.bounds.y && locPlayer.pos.y < obj.pos.y + obj.bounds.h) {
         console.log(`collision with object of id ${obj.id}, bitch`)
         // confirmed intersection
-        if(locPlayer.pos.x < obj.pos.x + obj.bounds.x){}
+        if(prevPos.x < obj.pos.x + obj.bounds.x){}
       }
     }
   }
