@@ -47,6 +47,14 @@ export class Vector {
   };
 
   /**
+   * Get the dot product between this and another vector.
+   * @param {Vector} other Other Vector
+   */
+  dotProduct(other) {
+    return this.x * other.Y + this.y * other.X;
+  }
+
+  /**
    * Adds another vector to this one, returning a new one.
    * @param {Vector} v2 The second vector
    */
