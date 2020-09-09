@@ -166,10 +166,12 @@ const tick = (now) => {
     if (!locPlayer.moving)
       locPlayer.velocity = new Vector(0, 0);
 
-    // modifies locPlayer velocity if  there will be a collision
-    locPlayerColl(locPlayer)
+    const prevPos = new Vector(locPlayer.pos.x, locPlayer.pos.y)
 
     locPlayer.pos.addTo(locPlayer.velocity.multiply(10 * dt));
+
+    // if collision put player in against wall
+    locPlayerColl(locPlayer, prevPos)
 
     playerList = Object.values(players);
 
