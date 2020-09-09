@@ -1,4 +1,6 @@
 import { Vector } from "./Vector.js";
+import { AABB } from './util.js'
+import { ctx } from '../canvas.js';
 
 export class Ray {
   /**
@@ -46,37 +48,50 @@ export const lineIntersect = (a1, a2, b1, b2) => {
   return a1.add(a.multiply(t));
 }
 
+const rectNormals = [
+  new Vector(0, 1),
+  new Vector(0, -1),
+  new Vector(-1, 0),
+  new Vector(1, 0),
+];
+
 /**
  * 
- * @param {Ray} r The ray to check
+ * @param {Ray} ray The ray to check
+ * @param {AABB} bounds The box bounds
  */
-export function boxIntersect(r) { // TODO: maybe implement cohen-sutherland
-  let tmin, tmax, tymin, tymax, tzmin, tzmax;
+export function boxIntersect(ray, bounds) { // TODO: maybe implement cohen-sutherland
+  const a = new Vector2(bounds.x, bounds.y);
+  const b = a.add(new Vector2(bounds.w, 0));
+  const c = a.add(new Vector2(bounds.w, bounds.h));
+  const d = a.add(new Vector2(0, bounds.h));
 
+  const rA = ray.origin;
+  const rB = ray.origin.add(ray.dir);
 
+  const sides = [
+    lineIntersect(rA, rB, a, b), // top
+    lineIntersect(rA, rB, c, d), // bottom
+    lineIntersect(rA, rB, a, c), // left
+    lineIntersect(rA, rB, b, d), // right
+  ]
 
-  tmin = (bounds[r.sign[0]].x - r.orig.x) * r.invdir.x;
-  tmax = (bounds[1 - r.sign[0]].x - r.orig.x) * r.invdir.x;
-  tymin = (bounds[r.sign[1]].y - r.orig.y) * r.invdir.y;
-  tymax = (bounds[1 - r.sign[1]].y - r.orig.y) * r.invdir.y;
+  let minDist = 100000;
+  let minPoint = -1;
+  sides.forEach((side, i) => {
+    let dist = rA.subtract(side).getSqrtMagnitude();
+    if (dist < minDist) {
+      minPoint = i;
+      minDist = dist;
+    }
+  })
+  if (minPoint != -1) {
+    return {
+      point: sides[minPoint],
+      normal: rectNormals[minPoint],
+    }
+  } else {
+    return false
+  }
 
-
-  if ((tmin > tymax) || (tymin > tmax))
-    return false;
-  if (tymin > tmin)
-    tmin = tymin;
-  if (tymax < tmax)
-    tmax = tymax;
-
-  tzmin = (bounds[r.sign[2]].z - r.orig.z) * r.invdir.z;
-  tzmax = (bounds[1 - r.sign[2]].z - r.orig.z) * r.invdir.z;
-
-  if ((tmin > tzmax) || (tzmin > tmax))
-    return false;
-  if (tzmin > tmin)
-    tmin = tzmin;
-  if (tzmax < tmax)
-    tmax = tzmax;
-
-  return true;
 } 
