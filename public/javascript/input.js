@@ -12,7 +12,8 @@ export const getKeyCode = (key) => {
 }
 
 //// MOUSE/TOUCH
-let mousePos = { x: 0, y: 0 };
+/** @type {Vector} */
+export let mousePos = new Vector(0, 0);
 let mouseState = 2; // 0 - held, 1 - just pressed, 2 - released, 3 - just released
 let mouseIsEaten = false; // used for mouse click consuming items (buttons, etc)
 
