@@ -18,6 +18,7 @@ import { drawUI, tickUI } from './ui/ui.js'
 // twgl.setDefaults({ attribPrefix: "a_" });
 
 import { locPlayerColl } from './physics.js'
+import { lineIntersect } from './util/raycasts.js'
 
 /** @type {SocketIO.Socket} */
 const socket = io('/' + sessionStorage.getItem('code'));
@@ -342,8 +343,9 @@ const draw = async (dt) => {
   ctx.font = "11px monospace"
   ctx.textAlign = "right"
   ctx.fillText(locPlayer.pos, W - 10, 10);
-  ctx.fillText(camera.zoom, W - 10, 20);
-  ctx.fillText((camera.zoom / gl.canvas.width) / 2, W - 10, 30);
+  ctx.fillText(camera.pos, W - 10, 20);
+  ctx.fillText(camera.zoom, W - 10, 30);
+  ctx.fillText((camera.zoom / gl.canvas.width) / 2, W - 10, 40);
   // ctx.fillText(, 10, 40);
   ctx.setTransform(camera.zoom, 0, 0, camera.zoom, -camera.pos.x * camera.zoom, -camera.pos.y * camera.zoom);
 
@@ -439,6 +441,26 @@ const draw = async (dt) => {
   drawUI(ctx, dt, socket, playerCount, locPlayer);
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = "black";
+  ctx.fillRect(input.mousePos.x - 1, input.mousePos.y - 1, 3, 3);
+  ctx.fillStyle = "white";
+  ctx.fillRect(input.mousePos.x, input.mousePos.y, 1, 1);
+
+  const a1 = input.mousePos;
+  const a2 = new Vector(300, H / 2 - 50);
+  const b1 = camera.pos.multiply(camera.zoom).add(new Vector(1000, 500));
+  const b2 = new Vector(500, H / 2 - 250);
+  const intersect = lineIntersect(a1, a2, b1, b2, ctx);
+  ctx.strokeStyle = intersect != false ? "green" : "red";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(a1.x, a1.y);
+  ctx.lineTo(a2.x, a2.y);
+  ctx.moveTo(b1.x, b1.y);
+  ctx.lineTo(b2.x, b2.y);
+  ctx.stroke();
+  if (intersect)
+    ctx.fillRect(intersect.x, intersect.y, 5, 5);
 }
 
 // TODO: maybe not use setInterval? not sure
