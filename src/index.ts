@@ -58,7 +58,7 @@ app.get('/game', (req, res) => {
 })
 
 // TODO: move this shit elsewhere
-
+// FIXME: stop allowing invalid room code from connecting to that namespace
 const workspaces = io.of(/^\/([A-Z]){4}$/);
 // TODO: look into namespace middlewares
 workspaces.on('connection', (socket: socketio.Socket) => {
@@ -85,8 +85,11 @@ workspaces.on('connection', (socket: socketio.Socket) => {
       pos: { x: 0, y: 0 },
       velocity: { x: 0, y: 0 },
       name,
+      dead: false,
       host: playerList.length === 0,
       color: Math.floor(Math.random() * 11),
+      lastKill: -1,
+      lastUpdate: -1,
     };
     socket.emit('you', player); // send new player themselves (meta)
     socket.broadcast.emit('new player', player); // send new player to all existing players
@@ -95,9 +98,19 @@ workspaces.on('connection', (socket: socketio.Socket) => {
       socket.emit('new player', pl);
     }
 
-    socket.on('movement update', (id: string, pos: { x: number, y: number }, vel: { x: number, y: number }) => {
-      socket.broadcast.emit('movement update', id, pos, vel);
+    socket.on('kill', (id: string) => {
+      room.players[id].dead = true;
+      workspaces.emit('kill', id);
     })
+
+    socket.on('movement update', (id: string, pos: { x: number, y: number }, vel: { x: number, y: number }) => {
+      if (room.players[id].dead) return;
+      room.players[id].pos = pos;
+      room.players[id].velocity = vel;
+      // if (player.lastUpdate === -1)
+      socket.broadcast.volatile.emit('movement update', id, pos, vel);
+    })
+
     socket.on('disconnect', () => {
       socket.broadcast.emit('player leave', player.id)
       delete room.players[player.id]

@@ -44,6 +44,14 @@ export const lerp = (a, b, t) => {
   return a + (b - a) * t;
 }
 
+export const textureFromCanvas = (gl, canvas, type) => {
+  var texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, type, canvas.width, canvas.height, 0, type, gl.UNSIGNED_BYTE, canvas);
+  // Other texture setup here, like filter modes and mipmap generation
+  return texture;
+}
+
 // TODO: real colours
 export const colors = [
   [140 / 255, 252 / 255, 60 / 255, 1],  // green

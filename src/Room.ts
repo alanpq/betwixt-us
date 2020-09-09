@@ -16,6 +16,7 @@ export default class Room {
 
   settings: GameSettings;
   players: { [id: string]: IPlayer };
+  socketUUIDs: { [id: string]: string };
 
   host: string;
 

@@ -71,3 +71,15 @@ button.sub:hover {
 button.sub:active {
   background-color: rgb(23, 70, 172);
 }
+
+#error {
+  overflow   : hidden;
+  color      : rgb(255, 43, 43);
+  font-weight: bolder;
+  max-height : 0;
+  transition : max-height 0.5s ease-in-out;
+}
+
+#error.active {
+  max-height: 1000px;
+}

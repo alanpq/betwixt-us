@@ -5,7 +5,6 @@ uniform mat4 u_matrix;
 uniform mat4 u_textureMatrix;
 
 attribute vec4 position;
-attribute vec3 normal;
 attribute vec2 texcoord;
 
 

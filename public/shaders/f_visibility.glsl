@@ -11,7 +11,7 @@ void main() {
   float maxDistance = pow( u_radius, 1.0);
   float quadDistance = pow( distance, 1.0);
 
-  float quadIntensity = 1.0 - min( quadDistance, maxDistance )/maxDistance;
+  float quadIntensity = 1.0 - pow(min( quadDistance, maxDistance )/maxDistance, 3.0);
 
   gl_FragColor = vec4(u_tint.rgb, (1.0-quadIntensity) * u_tint.a) * u_tint.a;
 }

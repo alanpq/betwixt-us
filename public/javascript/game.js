@@ -1,20 +1,23 @@
 import * as twgl from './lib/twgl-full.module.js'
 import Player from './Player.js'
 import * as input from './input.js'
-import { addObject, drawScene, gameObjects, instantiate, recalculateBounds } from './object.js'
-import { gl, m4, camera, ctx, loadShader } from './render.js'
+import { canvas, overlayCanvas, gl, ctx, W, H } from './canvas.js'
 
-import { solidProgramInfo, drawSprite, getSprite, drawTex } from './sprite.js'
-
-import * as joystick from './ui/joystick.js'
 import { Vector } from './util/Vector.js'
 import { colors, lerp, mobileCheck, debounce } from './util/util.js'
-import { canvas, overlayCanvas, W, H } from './canvas.js'
+import { addObject, drawScene, gameObjects, instantiate, recalculateBounds } from './object.js'
+
+import { solidProgramInfo, drawSprite, getSprite, drawTex, spriteShader } from './sprite.js'
+
+import * as joystick from './ui/joystick.js'
+import { m4, camera, loadShader } from './render.js'
 
 import { baseVisibility, gameOptions, gameState } from './state.js'
 
 import { drawUI, tickUI } from './ui/ui.js'
 // twgl.setDefaults({ attribPrefix: "a_" });
+
+import { locPlayerColl } from './physics.js'
 
 /** @type {SocketIO.Socket} */
 const socket = io('/' + sessionStorage.getItem('code'));
@@ -46,21 +49,42 @@ socket.on('connect', () => {
     playerCount--;
   })
 
+  socket.on('kill', id => { // TODO: do serverside kill time checking
+    console.log("someone else died !!")
+    if (players[id])
+      players[id].dead = true;
+    else if (locPlayer.id == id)
+      locPlayer.dead = true;
+  })
+
+  // TODO: do serverside movement speed/collision checking
+  // TODO: separate these - dont need as many position updates as velocity updates
   socket.on('movement update', (id, pos, vel) => {
     if (!players[id]) return console.log(`${id} not found!`);
-    players[id].pos = pos;
-    players[id].velocity = vel;
+    players[id].pos.x = pos.x;
+    players[id].pos.y = pos.y;
+    players[id].velocity.x = vel.x;
+    players[id].velocity.y = vel.y;
+
+    if (vel.x != 0)
+      players[id].facing = vel.x > 0
+
+    players[id].moving = vel.x < -0.05 || vel.x > 0.05 || vel.y < -0.05 || vel.y > 0.05
   })
 
   socket.on('you', (newPlayer) => {
     locPlayer = new Player(newPlayer);
+    locPlayer.isLocal = true;
   })
 
   socket.emit('self register', localStorage.getItem("name"));
 })
+window.focused = true;
+window.onblur = document.onblur = () => { window.focused = false; }
+window.onfocus = document.onfocus = () => { window.focused = true; }
 
 addObject(gl, {
-  pos: new Vector(0, 0),
+  pos: new Vector(1, 0),
   sprite: "box",
   bounds: {
     x: -1.7 / 2,
@@ -95,18 +119,21 @@ addObject(gl, {
 /** @type {{[id: string] : Player}} */
 const players = {};
 /** @type {Player} */
-let locPlayer = new Player();
+export let locPlayer = new Player();
 let playerCount = 1;
 
+export let time = 0;
+/** @type {Player[]} */
+let playerList;
+
+/** @type {Player} */
+let closestPlayer = null;
 
 let prev;
 const tick = (now) => {
   const dt = (now - prev) / 1000; // change in seconds
   prev = now;
-
-  // camera.zoom = (Math.min(W, H) / Math.max(W, H)) * 0.05;
-
-  tickUI(dt);
+  time += dt; // TODO: figure out if it should be dt or something else
 
   // if (document.fullscreenElement == null && isMobile) {
   //   draw(dt);
@@ -115,23 +142,59 @@ const tick = (now) => {
 
   camera.W = W / camera.zoom;
   camera.H = H / camera.zoom;
+  if (!locPlayer.dead) {
+    gameState.killCounter -= dt;
+    // TODO: better key shit
+    let inp = new Vector(
+      input.getKeyCode(68) - input.getKeyCode(65),
+      input.getKeyCode(83) - input.getKeyCode(87)
+    ).add(input.joystick);
+    if (inp.getLength > 1)
+      inp.setLength(1);
 
-  // TODO: better key shit
-  const inp = new Vector(
-    input.getKeyCode(68) - input.getKeyCode(65),
-    input.getKeyCode(83) - input.getKeyCode(87)
-  ).add(input.joystick);
-  if (inp.getLength > 1)
-    inp.setLength(1);
+    if (!window.focused) {
+      locPlayer.velocity = new Vector(0, 0)
+      inp = new Vector(0, 0)
+    }
+    locPlayer.velocity = Vector.lerp(locPlayer.velocity, inp, 15 * dt);
 
-  const deltaMovement = inp.multiply(dt * 100);
-  locPlayer.velocity = Vector.lerp(locPlayer.velocity, inp, 20 * dt);
-  locPlayer.pos.addTo(locPlayer.velocity.multiply(10 * dt));
+
+    if (locPlayer.velocity.x != 0)
+      locPlayer.facing = locPlayer.velocity.x > 0
+
+    locPlayer.moving = locPlayer.velocity.x < -0.05 || locPlayer.velocity.x > 0.05 || locPlayer.velocity.y < -0.05 || locPlayer.velocity.y > 0.05
+    if (!locPlayer.moving)
+      locPlayer.velocity = new Vector(0, 0);
+
+    // modifies locPlayer velocity if  there will be a collision
+    locPlayerColl(locPlayer)
+
+    locPlayer.pos.addTo(locPlayer.velocity.multiply(10 * dt));
+
+    playerList = Object.values(players);
+
+    closestPlayer = null;
+    let min = gameOptions.kill_range;
+    for (let player of playerList) {
+      const d = Math.abs(player.pos.subtract(locPlayer.pos).getLength());
+      if (d < min && !player.dead) {
+        min = d;
+        closestPlayer = player;
+      }
+    }
+
+    if (closestPlayer && input.getKeyCode(69) && gameState.killCounter <= 0) {
+      gameState.killCounter = gameOptions.kill_counter;
+      socket.emit('kill', closestPlayer.id)
+      console.log('kill')
+    }
+  }
 
   camera.pos = Vector.lerp(camera.pos, locPlayer.pos.subtract(new Vector(camera.W / 2, camera.H / 2)), 10 * dt);
   // inputInterpreter();
   draw(dt);
   // inputTick();
+  tickUI(prev, performance.now());
   window.requestAnimationFrame(tick);
 }
 
@@ -282,11 +345,11 @@ const draw = async (dt) => {
   // ctx.fillText(, 10, 40);
   ctx.setTransform(camera.zoom, 0, 0, camera.zoom, -camera.pos.x * camera.zoom, -camera.pos.y * camera.zoom);
 
-  ctx.strokeStyle = "black";
-  ctx.lineWidth = 0.01;
-  ctx.beginPath();
-  ctx.arc(locPlayer.pos.x, locPlayer.pos.y, baseVisibility, 0, Math.PI * 2);
-  ctx.stroke();
+  // ctx.strokeStyle = "black";
+  // ctx.lineWidth = 0.01;
+  // ctx.beginPath();
+  // ctx.arc(locPlayer.pos.x, locPlayer.pos.y, baseVisibility, 0, Math.PI * 2);
+  // ctx.stroke();
 
   // twgl.resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -308,26 +371,48 @@ const draw = async (dt) => {
   gl.colorMask(false, false, false, false); // dont write to color buffer
   drawVisibility();
 
-  gl.stencilMask(0); // dont write to stencil buffer
   gl.colorMask(true, true, true, true); // write to color buffer
   gl.depthMask(true); // write to depth buffer
   gl.enable(gl.DEPTH_TEST);
-  gl.stencilFunc(gl.NOTEQUAL, 1, 0xff); // pass stencil if stencil != 1
 
-  for (let player of Object.values(players)) {
-    player.draw(gl); // TODO: fix these params
-  }
+  gl.stencilFunc(gl.ALWAYS, 0, 0xff);
+  drawScene(gl, camera);
 
-  gl.stencilFunc(gl.EQUAL, 1, 0xff);
-  gl.depthMask(false); // dont write to depth buffer
-  drawSprite(gl, await getSprite(gl, "pixel"), locPlayer.pos, true, [0, 0, 0, 0.9], camera.W)
 
   gl.enable(gl.DEPTH_TEST);
   gl.stencilFunc(gl.ALWAYS, 1, 0xff); // ignore stencil buffer (always pass)
   gl.depthMask(true); // write to depth buffer
 
+  locPlayer.draw(gl, dt);
 
-  locPlayer.draw(gl);
+  gl.stencilFunc(gl.EQUAL, 0, 0xff); // pass stencil if stencil == 0
+
+  if (closestPlayer)
+    closestPlayer.drawHighlight(gl, [1, 0, 0, 1]);
+  for (let player of playerList) {
+    player.draw(gl, dt); // TODO: fix these params
+    player.drawNametag(gl); // TODO: fix these params
+  }
+
+  gl.stencilFunc(gl.EQUAL, 1, 0xff);
+  gl.depthMask(false); // dont write to depth buffer
+  gl.stencilMask(0); // dont write to stencil buffer
+
+
+  // drawSprite(gl, await getSprite(gl, "pixel"), locPlayer.pos, true, [0, 0, 0, 0.9], camera.W)
+  drawTex(gl, await getSprite(gl, "pixel"), {
+    x: locPlayer.pos.x,
+    y: locPlayer.pos.y,
+    z: -10,
+  }, camera.pos, [camera.W, camera.H], spriteShader, {
+    u_tint: [0, 0, 0, 0.9]
+  })
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.stencilFunc(gl.ALWAYS, 1, 0xff); // ignore stencil buffer (always pass)
+  gl.depthMask(true); // write to depth buffer
+  locPlayer.drawNametag(gl);
+
 
   gl.stencilFunc(gl.NOTEQUAL, 1, 0xff); // pass stencil if stencil == 1
   gl.depthMask(false); // dont write to depth buffer
@@ -335,7 +420,7 @@ const draw = async (dt) => {
     x: locPlayer.pos.x,
     y: locPlayer.pos.y,
     z: -50,
-  }, camera.pos, camera.W, visibilityShader, {
+  }, camera.pos, [camera.W, camera.H], visibilityShader, {
     u_lightPosition: [W / 2, H / 2],
     u_radius: baseVisibility * camera.zoom,
     u_tint: [0, 0, 0, 0.9],
@@ -347,8 +432,6 @@ const draw = async (dt) => {
 
 
 
-
-  drawScene(gl, camera);
   joystick.drawJoystick();
 
   drawUI(ctx, dt, socket, playerCount, locPlayer);

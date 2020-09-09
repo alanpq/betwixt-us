@@ -1,6 +1,7 @@
 import { fillStrokedText } from '../util/util.js'
 import { canvas, overlayCanvas, W, H } from '../canvas.js'
 import { drawButton } from './button.js'
+import { gameState } from '../state.js';
 
 export const options = {
   fpsDisplay: 2, // 0 - off, 1 - fps, 2 - full
@@ -15,8 +16,9 @@ let frameTimeI = 0;
 let frameTimeSamples = new Array(99);
 const frameTimeSampleCount = 100;
 
-export const tickUI = (dt) => {
+export const tickUI = (prev, now) => {
   if (options.fpsDisplay > 0) {
+    let dt = now - prev
     frameTimeSum -= frameTimeSamples[frameTimeI] || 0;
     frameTimeSamples[frameTimeI] = dt;
     frameTimeSum += dt;
@@ -36,11 +38,11 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
   ctx.textAlign = "left";
   const avgFrameTime = (frameTimeSum / frameTimeSamples.length);
   if (options.fpsDisplay == 2) {
-    ctx.fillText(`    Avg Frame Time: ${(avgFrameTime * 1000).toPrecision(4)} ms`, 5, 23);
-    ctx.fillText(`Min/Max Frame Time: ${(frameTimeMin * 1000).toPrecision(4)}/${(frameTimeMax * 1000).toPrecision(4)} ms`, 5, 43);
+    ctx.fillText(`    Avg Frame Time: ${(avgFrameTime).toPrecision(4)} ms`, 5, 23);
+    ctx.fillText(`Min/Max Frame Time: ${(frameTimeMin).toPrecision(4)}/${(frameTimeMax).toPrecision(4)} ms`, 5, 43);
   }
   if (options.fpsDisplay >= 1) {
-    ctx.fillText(`${options.fpsDisplay == 2 ? '           ' : ''}Avg FPS: ${(1 / avgFrameTime).toPrecision(3)} FPS`, 5, 63);
+    ctx.fillText(`${options.fpsDisplay == 2 ? '           ' : ''}Avg FPS: ${(1000 / avgFrameTime).toPrecision(6)} FPS`, 5, 63);
     if (frameTimeSamples[frameTimeI] <= frameTimeMin)
       frameTimeMin = 100000;
     if (frameTimeSamples[frameTimeI] >= frameTimeMax)
@@ -75,6 +77,10 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
     if (drawButton(ctx, "Start", W / 2, H - 130, 250, 80, 0.5, 1, playerCount < 4))
       console.log('start game!!')
   }
+
+  ctx.textAlign = "right";
+  ctx.font = "30px Kumbh Sans, sans-serif";
+  fillStrokedText(ctx, Math.max(0, gameState.killCounter.toFixed(0)), W - 10, H - 43)
 
   ctx.fillStyle = "white";
 

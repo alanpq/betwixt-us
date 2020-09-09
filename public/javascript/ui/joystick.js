@@ -1,6 +1,3 @@
-import { drawSprite, getSprite } from "../sprite.js";
-
-import { gl, m4, loadShader, camera } from '../render.js'
 import { joystick } from '../input.js'
 
 import { Vector } from '../util/Vector.js'

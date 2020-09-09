@@ -13,7 +13,9 @@ export const gameState = {
   updateScore(change) {
     this._score += change
     // scoreUIDraw()
-  }
+  },
+
+  killCounter: 1,
 
 }
 
@@ -22,4 +24,6 @@ export const baseVisibility = 8;
 export const gameOptions = {
   max_score: 100,
   crew_visibility: 1,
+  kill_range: 1.75,
+  kill_counter: 1,
 }

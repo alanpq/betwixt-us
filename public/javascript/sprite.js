@@ -1,16 +1,20 @@
 import * as twgl from './lib/twgl-full.module.js'
-import { gl, m4, loadShader, camera } from './render.js'
+import { m4, loadShader, camera } from './render.js'
+import { gl } from './canvas.js'
+import { Vector } from './util/Vector.js'
 
 
 export let spriteShader;
+export let spriteSheetShader;
+export let solidProgramInfo;
 (async () => {
   spriteShader = twgl.createProgramInfo(gl, [await loadShader("vertex"), await loadShader("fragTex")])
-})()
-export const quadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
-export let solidProgramInfo
-(async () => {
+  spriteSheetShader = twgl.createProgramInfo(gl, [await loadShader("v_animSprite"), await loadShader("fragTex")])
   solidProgramInfo = twgl.createProgramInfo(gl, [await loadShader("vertex"), await loadShader("frag")]);
 })()
+
+export const quadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
+
 
 /**
  * @type {{[name: string]: {texture: WebGLTexture}}}
@@ -35,7 +39,7 @@ export const getSprite = (gl, spriteName) => {
   }
 }
 
-export const drawTex = (gl, tex, pos, cameraOff, scale = 1, shader, uniforms = {}) => {
+export const drawTex = (gl, tex, pos, cameraOff, scale = [1, 1], shader, uniforms = {}) => {
   if (!shader || !tex || !pos) return;
 
 
@@ -55,23 +59,93 @@ export const drawTex = (gl, tex, pos, cameraOff, scale = 1, shader, uniforms = {
 
   uniforms.u_matrix = twgl.m4.multiply(viewProjection, world)
   uniforms.u_texture = tex;
-  twgl.m4.scale(uniforms.u_matrix, [scale, scale, 1], uniforms.u_matrix)
+  twgl.m4.scale(uniforms.u_matrix, [...scale, 1], uniforms.u_matrix)
   gl.useProgram(shader.program)
   twgl.setBuffersAndAttributes(gl, shader, quadBufferInfo);
   twgl.setUniforms(shader, uniforms);
   twgl.drawBufferInfo(gl, quadBufferInfo);
 }
 
-export const drawSprite = (gl, sprite, pos, worldSpace = false, tint = [1, 1, 1, 1], scale = 1, customShader = null, customUniforms = {}) => {
+/**
+ * 
+ * @param {WebGLRenderingContext} gl 
+ * @param {*} sprite 
+ * @param {*} pos 
+ * @param {*} worldSpace 
+ * @param {*} tint 
+ * @param {*} scale 
+ * @param {*} customShader 
+ * @param {*} customUniforms 
+ */
+export const drawSprite = (gl, sprite, pos, worldSpace = false, tint = [1, 1, 1, 1], scale = [1, 1], customShader = null, customUniforms = {}, customZ = null) => {
   if (!spriteShader || !sprite || !pos) return;
   const uniforms = {
     u_tint: tint,
+    u_cutThreshold: 1,
     ...customUniforms
   };
-
+  gl.depthMask(true);
+  gl.colorMask(false, false, false, false);
   drawTex(gl, sprite, {
     x: pos.x,
     y: pos.y,
-    z: -pos.y,
+    z: customZ || -pos.y,
   }, camera.pos, scale, customShader || spriteShader, uniforms);
+
+  gl.colorMask(true, true, true, true);
+  gl.depthMask(false);
+  gl.stencilMask(0);
+
+  uniforms.u_cutThreshold = 0;
+  drawTex(gl, sprite, {
+    x: pos.x,
+    y: pos.y,
+    z: customZ || -pos.y,
+  }, camera.pos, scale, customShader || spriteShader, uniforms);
+  gl.depthMask(true);
+}
+
+/**
+ * 
+ * @param {WebGLRenderingContext} gl 
+ * @param {WebGLTexture} spriteSheet 
+ * @param {*} frame 
+ * @param {*} framesPerRow 
+ * @param {*} frames 
+ * @param {*} pos 
+ * @param {*} worldSpace 
+ * @param {*} tint 
+ * @param {*} scale 
+ * @param {*} customShader 
+ * @param {*} customUniforms 
+ */
+export const drawSpriteSheet = (gl, spriteSheet, frame, framesPerRow, frames, pos, worldSpace = false, tint = [1, 1, 1, 1], scale = [1, 1], customUniforms = {}) => {
+  if (!spriteSheetShader) return;
+  const uniforms = {
+    u_tint: tint,
+    u_frameOffset: frame,
+    u_spritesPerRow: framesPerRow,
+    u_numFrames: frames,
+    u_cutThreshold: 1,
+    ...customUniforms,
+  };
+
+  gl.depthMask(true);
+  gl.colorMask(false, false, false, false);
+  drawTex(gl, spriteSheet, {
+    x: pos.x,
+    y: pos.y,
+    z: -pos.y,
+  }, camera.pos, scale, spriteSheetShader, uniforms);
+
+  gl.colorMask(true, true, true, true);
+  gl.depthMask(false);
+  gl.stencilMask(0);
+
+  uniforms.u_cutThreshold = 0;
+  drawTex(gl, spriteSheet, {
+    x: pos.x,
+    y: pos.y,
+    z: -pos.y,
+  }, camera.pos, scale, spriteSheetShader, uniforms);
 }

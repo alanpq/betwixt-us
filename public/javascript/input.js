@@ -4,6 +4,7 @@ import { Vector } from './util/Vector.js'
 
 export const keyState = {};
 
+
 export const joystick = new Vector(0, 0);
 
 export const getKeyCode = (key) => {
