@@ -4,10 +4,15 @@ import { Vector } from './util/Vector.js'
 
 export const m4 = twgl.m4;
 
+const shaders = {};
+
 export const loadShader = async (path) => { // TODO: cache shaders
-  return fetch(`../shaders/${path}.glsl`).then(res => {
+  // console.log(shaders)
+  if (shaders[path]) return shaders[path];
+  return fetch(`../shaders/${path}.glsl`).then(async (res) => {
     console.log(`Loaded shader '${path}'!`)
-    return res.text()
+    shaders[path] = await res.text();
+    return shaders[path]
   }).catch((reason) => {
     console.error(`Failed to load shader '${path}'!`)
     console.error(`Reason: ${reason}`)
