@@ -84,8 +84,31 @@ window.focused = true;
 window.onblur = document.onblur = () => { window.focused = false; }
 window.onfocus = document.onfocus = () => { window.focused = true; }
 
+
 addObject(gl, {
-  pos: new Vector(1, 0),
+  pos: new Vector(-3, -3),
+  sprite: "box",
+  bounds: {
+    x: 0,
+    y: 0,
+    w: 1,
+    h: 1,
+  }
+});
+
+addObject(gl, {
+  pos: new Vector(-2.1, -2.1),
+  sprite: "box",
+  bounds: {
+    x: 0,
+    y: 0,
+    w: 1,
+    h: 1,
+  }
+});
+
+addObject(gl, {
+  pos: new Vector(3, 0),
   sprite: "box",
   bounds: {
     x: -1.7 / 2,
@@ -96,7 +119,7 @@ addObject(gl, {
 });
 
 addObject(gl, {
-  pos: new Vector(3, 2),
+  pos: new Vector(4, 1),
   sprite: "box",
   bounds: {
     x: -1.7 / 2,
@@ -136,6 +159,7 @@ const tick = (now) => {
   prev = now;
   time += dt; // TODO: figure out if it should be dt or something else
 
+  ctx.clearRect(0, 0, W, H) // TODO: put this back in draw (needed it here for player coll visualisations)
   // if (document.fullscreenElement == null && isMobile) {
   //   draw(dt);
   //   return;
@@ -150,7 +174,7 @@ const tick = (now) => {
       input.getKeyCode(68) - input.getKeyCode(65),
       input.getKeyCode(83) - input.getKeyCode(87)
     ).add(input.joystick);
-    if (inp.getLength > 1)
+    if (inp.getLength() > 1)
       inp.setLength(1);
 
     if (!window.focused) {
@@ -167,12 +191,9 @@ const tick = (now) => {
     if (!locPlayer.moving)
       locPlayer.velocity = new Vector(0, 0);
 
-    const prevPos = new Vector(locPlayer.pos.x, locPlayer.pos.y)
 
-    locPlayer.pos.addTo(locPlayer.velocity.multiply(10 * dt));
+    locPlayerColl(locPlayer, dt);
 
-    // if collision put player in against wall
-    locPlayerColl(locPlayer, prevPos)
 
     playerList = Object.values(players);
 
@@ -338,7 +359,6 @@ const drawVisibility = () => { // TODO: convex polygons?
 }
 
 const draw = async (dt) => {
-  ctx.clearRect(0, 0, W, H)
   ctx.fillStyle = "white"
   ctx.font = "11px monospace"
   ctx.textAlign = "right"
@@ -446,21 +466,21 @@ const draw = async (dt) => {
   ctx.fillStyle = "white";
   ctx.fillRect(input.mousePos.x, input.mousePos.y, 1, 1);
 
-  const a1 = input.mousePos;
-  const a2 = new Vector(300, H / 2 - 50);
-  const b1 = camera.pos.multiply(camera.zoom).add(new Vector(1000, 500));
-  const b2 = new Vector(500, H / 2 - 250);
-  const intersect = lineIntersect(a1, a2, b1, b2, ctx);
-  ctx.strokeStyle = intersect != false ? "green" : "red";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(a1.x, a1.y);
-  ctx.lineTo(a2.x, a2.y);
-  ctx.moveTo(b1.x, b1.y);
-  ctx.lineTo(b2.x, b2.y);
-  ctx.stroke();
-  if (intersect)
-    ctx.fillRect(intersect.x, intersect.y, 5, 5);
+  // const a1 = input.mousePos;
+  // const a2 = new Vector(300, H / 2 - 50);
+  // const b1 = camera.pos.multiply(camera.zoom).add(new Vector(1000, 500));
+  // const b2 = new Vector(500, H / 2 - 250);
+  // const intersect = lineIntersect(a1, a2, b1, b2, ctx);
+  // ctx.strokeStyle = intersect != false ? "green" : "red";
+  // ctx.lineWidth = 2;
+  // ctx.beginPath();
+  // ctx.moveTo(a1.x, a1.y);
+  // ctx.lineTo(a2.x, a2.y);
+  // ctx.moveTo(b1.x, b1.y);
+  // ctx.lineTo(b2.x, b2.y);
+  // ctx.stroke();
+  // if (intersect)
+  //   ctx.fillRect(intersect.x, intersect.y, 5, 5);
 }
 
 // TODO: maybe not use setInterval? not sure
