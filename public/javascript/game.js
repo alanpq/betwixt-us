@@ -84,29 +84,6 @@ window.focused = true;
 window.onblur = document.onblur = () => { window.focused = false; }
 window.onfocus = document.onfocus = () => { window.focused = true; }
 
-
-addObject(gl, {
-  pos: new Vector(-3, -3),
-  sprite: "box",
-  bounds: {
-    x: 0,
-    y: 0,
-    w: 1,
-    h: 1,
-  }
-});
-
-addObject(gl, {
-  pos: new Vector(-2.1, -2.1),
-  sprite: "box",
-  bounds: {
-    x: 0,
-    y: 0,
-    w: 1,
-    h: 1,
-  }
-});
-
 addObject(gl, {
   pos: new Vector(3, 0),
   sprite: "box",
