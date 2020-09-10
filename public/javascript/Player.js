@@ -24,7 +24,7 @@ let crownSprite;
   nametagShader = twgl.createProgramInfo(gl, [await loadShader("vertex"), await loadShader("f_player")])
 })()
 
-const stepsPerSec = 3.4;
+const stepsPerSec = 4.1;
 
 const width = 60;
 const height = 100;
