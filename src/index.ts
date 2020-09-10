@@ -104,7 +104,7 @@ workspaces.on('connection', (socket: socketio.Socket) => {
     })
 
     socket.on('movement update', (id: string, pos: { x: number, y: number }, vel: { x: number, y: number }) => {
-      if (room.players[id].dead) return;
+      if (!room.players[id] || room.players[id].dead) return;
       room.players[id].pos = pos;
       room.players[id].velocity = vel;
       // if (player.lastUpdate === -1)
