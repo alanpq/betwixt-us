@@ -26,4 +26,5 @@ export const gameOptions = {
   crew_visibility: 1,
   kill_range: 1.75,
   kill_counter: 1,
+  player_speed: 5,
 }
