@@ -336,6 +336,7 @@ const drawVisibility = () => { // TODO: convex polygons?
 }
 
 const draw = async (dt) => {
+  // console.time("Draw")
   ctx.fillStyle = "white"
   ctx.font = "11px monospace"
   ctx.textAlign = "right"
@@ -458,6 +459,7 @@ const draw = async (dt) => {
   // ctx.stroke();
   // if (intersect)
   //   ctx.fillRect(intersect.x, intersect.y, 5, 5);
+  // console.timeEnd("Draw")
 }
 
 // TODO: maybe not use setInterval? not sure
