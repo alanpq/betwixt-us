@@ -24,6 +24,8 @@ import { lineIntersect } from './util/raycasts.js'
 const socket = io('/' + sessionStorage.getItem('code'));
 console.log(`Connecting to room '${sessionStorage.getItem('code')}'`);
 
+const urlParams = new URLSearchParams(window.location.search);
+
 const isMobile = mobileCheck();
 
 socket.on('connect', () => {
@@ -78,7 +80,7 @@ socket.on('connect', () => {
     locPlayer.isLocal = true;
   })
 
-  socket.emit('self register', localStorage.getItem("name"));
+  socket.emit('self register', urlParams.get('name') || localStorage.getItem("name"));
 })
 window.focused = true;
 window.onblur = document.onblur = () => { window.focused = false; }
