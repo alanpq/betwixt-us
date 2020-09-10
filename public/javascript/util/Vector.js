@@ -55,7 +55,7 @@ export class Vector {
    * @param {Vector} other Other Vector
    */
   dotProduct(other) {
-    return this.x * other.y - this.y * other.x;
+    return this.x * other.y + this.y * other.x;
   }
 
   /**
