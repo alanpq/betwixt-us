@@ -49,14 +49,14 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
       frameTimeMax = -100000;
 
 
-    ctx.font = "10px Kumbh Sans, sans-serif"
-    ctx.beginPath()
-    ctx.moveTo(5, 0);
-    for (let i = 0; i < frameTimeSampleCount; i++) {
-      ctx.lineTo(5 + frameTimeSamples[i] * 10000, (H / frameTimeSampleCount) * i);
-    }
-    ctx.fillRect(0, (H / frameTimeSampleCount) * frameTimeI, 200, 1);
-    ctx.stroke();
+    // ctx.font = "10px Kumbh Sans, sans-serif"
+    // ctx.beginPath()
+    // ctx.moveTo(5, 0);
+    // for (let i = 0; i < frameTimeSampleCount; i++) {
+    //   ctx.lineTo(5 + frameTimeSamples[i] * 10000, (H / frameTimeSampleCount) * i);
+    // }
+    // ctx.fillRect(0, (H / frameTimeSampleCount) * frameTimeI, 200, 1);
+    // ctx.stroke();
   }
 
   ctx.lineWidth = 1;
