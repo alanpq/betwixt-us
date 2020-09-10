@@ -17,19 +17,20 @@ export const locPlayerColl = (locPlayer, dt) => { // FIXME: perfect edge interse
   const vel = new Vector(locPlayer.velocity.x, locPlayer.velocity.y);
   // let vel = mousePos.subtract(new Vector(W / 2, H / 2));
   // vel.multiplyBy(1 * dt);
-  vel.multiplyBy(gameOptions.player_speed * dt);
+  vel.multiplyBy(gameOptions.player_speed);
 
-  const ray = new Ray(locPlayer.pos, vel);
+  const ray = new Ray(locPlayer.pos, vel.multiply(dt));
 
   ctx.setTransform(camera.zoom, 0, 0, camera.zoom, -camera.pos.x * camera.zoom, -camera.pos.y * camera.zoom);
+
   ctx.strokeStyle = "gray";
   ctx.lineWidth = 0.05;
   ctx.beginPath();
   ctx.moveTo(ray.origin.x, ray.origin.y);
   ctx.lineTo(ray.origin.x + ray.dir.x, ray.origin.y + ray.dir.y)
   ctx.stroke();
-
   ctx.fillStyle = "purple";
+
   for (let obj of object.gameObjects) {
 
     const hit = boxIntersect(ray, obj.pos, obj.bounds);
@@ -55,9 +56,9 @@ export const locPlayerColl = (locPlayer, dt) => { // FIXME: perfect edge interse
       */
       const a = vel;
       const b = hit.tangent;
-      const dp = -hit.normal.dotProduct(vel);
-      vel.x = b.x * dp + b.x * 0.001;
-      vel.y = b.y * dp + b.y * 0.001;
+      const dp = -hit.normal.dotProduct(vel).toPrecision(4);
+      vel.x = b.x * dp;
+      vel.y = b.y * dp;
 
 
       ctx.fillStyle = "black";
@@ -72,7 +73,7 @@ export const locPlayerColl = (locPlayer, dt) => { // FIXME: perfect edge interse
   }
 
   // if (getKeyCode(82))
-  locPlayer.pos.addTo(vel)
+  locPlayer.pos.addTo(vel.multiply(dt))
 
 
 
