@@ -32,9 +32,16 @@ const height = 100;
 const origin = new Vector(0, .45);
 
 
-const calculateWalkCycle = (x, a = 4.5) => {
+const walkCycleSharpness = 4.5;
+const walkCycleExtremumA = 0.3209;
+const walkCycleExtremumB = 0.67218;
+
+const wCLong = walkCycleExtremumA * 2;
+const wCShort = walkCycleExtremumB - walkCycleExtremumA;
+
+const calculateWalkCycle = (x) => {
   // if you want to understand this one, plug it into geogebra
-  return 1 - Math.pow(Math.abs(Math.sin(Math.PI * x * stepsPerSec)), a)
+  return 1 - Math.pow(Math.abs(Math.sin(Math.PI * x * stepsPerSec)), walkCycleSharpness)
 }
 
 /**
@@ -217,8 +224,8 @@ export default class Player {
     // ctx.textAlign = "center";
 
     // ctx.fillText(this.walkCycle, this.pos.x, this.pos.y + 1)
-    // ctx.fillRect(this.pos.x - (Math.round(a) * 1.5) / 2, this.pos.y + 1.25, Math.round(a) * 1.5, 0.25);
-    // ctx.fillRect(this.pos.x - (Math.round(b) * 1.5) / 2, this.pos.y + 1.55, Math.round(b) * 1.5, 0.25);
+    // ctx.fillRect(this.pos.x - (Math.round(this.a) * 1.5) / 2, this.pos.y + 1.25, Math.round(this.a) * 1.5, 0.25);
+    // ctx.fillRect(this.pos.x - (Math.round(this.b) * 1.5) / 2, this.pos.y + 1.55, Math.round(this.b) * 1.5, 0.25);
     // ctx.fillText(time.toPrecision(5), this.pos.x, this.pos.y + 2.5)
 
     // ctx.shadowColor = "";
