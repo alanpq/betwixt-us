@@ -1,7 +1,7 @@
 * {
   touch-action: none;
   overflow    : hidden;
-  cursor      : none;
+  /* cursor      : none; */
 }
 
 canvas {
