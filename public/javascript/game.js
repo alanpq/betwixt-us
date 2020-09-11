@@ -154,8 +154,8 @@ const tick = (now) => {
     gameState.killCounter -= dt;
     // TODO: better key shit
     let inp = new Vector(
-      input.getKeyCode(68) - input.getKeyCode(65),
-      input.getKeyCode(83) - input.getKeyCode(87)
+      input.getKeyCode(68) - input.getKeyCode(65) + input.getKeyCode(39) - input.getKeyCode(37),
+      input.getKeyCode(83) - input.getKeyCode(87) + input.getKeyCode(40) - input.getKeyCode(38)
     ).add(input.joystick);
     if (inp.getLength() > 1)
       inp.setLength(1);
@@ -171,8 +171,8 @@ const tick = (now) => {
       locPlayer.facing = locPlayer.velocity.x > 0
 
     locPlayer.moving = locPlayer.velocity.x < -0.05 || locPlayer.velocity.x > 0.05 || locPlayer.velocity.y < -0.05 || locPlayer.velocity.y > 0.05
-    if (!locPlayer.moving)
-      locPlayer.velocity = new Vector(0, 0);
+    // if (!locPlayer.moving)
+    //   locPlayer.velocity = new Vector(0, 0);
 
 
     locPlayerColl(locPlayer, dt);
