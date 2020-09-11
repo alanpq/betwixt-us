@@ -192,8 +192,8 @@ export default class Player {
     every footstep (arc from ground to sky back to ground) goes through 3 frames, where the last frame of one step is the first frame of the next
     */
 
-    this.a = calculateWalkCycle((time - dt) - 0.5);
-    this.b = calculateWalkCycle((time) - 0.5);
+    this.a = calculateWalkCycle((time - dt) - 0.1);
+    this.b = calculateWalkCycle((time) - 0.1);
     if (Math.round(this.a) != Math.round(this.b)) // TODO: investigate offset walk cycle bug (link between lag + skipping frames?)
       this.walkCycle = this.walkCycle > 3 ? 1 : this.walkCycle + 1;
 
