@@ -139,10 +139,10 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
   ctx.font = "11px monospace"
   ctx.textAlign = "right"
   if (options.showPos) {
-    ctx.fillText(locPlayer.pos, W - 10, 10);
-    ctx.fillText(camera.pos, W - 10, 20);
-    ctx.fillText(camera.zoom, W - 10, 30);
-    ctx.fillText((camera.zoom / gl.canvas.width) / 2, W - 10, 40);
+    ctx.fillText(locPlayer.pos, W - 120, 16);
+    ctx.fillText(camera.pos, W - 120, 26);
+    ctx.fillText(camera.zoom, W - 120, 36);
+    ctx.fillText((camera.zoom / gl.canvas.width) / 2, W - 120, 46);
   }
 
   if (optionsMenuOpen)
