@@ -102,7 +102,7 @@ addObject(gl, {
 });
 
 addObject(gl, {
-  pos: new Vector(4, 1),
+  pos: new Vector(4, 2),
   sprite: "box",
   bounds: {
     x: -1.7 / 2,
@@ -389,7 +389,7 @@ const draw = async (dt) => {
   gl.stencilFunc(gl.EQUAL, 0, 0xff); // pass stencil if stencil == 0
 
   for (let player of playerList) {
-    player.tick(dt);
+    // player.tick(dt);
     player.draw(gl, dt); // TODO: fix these params
     player.drawNametag(gl); // TODO: fix these params
   }
