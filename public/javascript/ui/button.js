@@ -2,11 +2,11 @@ import { mousePos, GetLeftMouse, GetLeftMouseUp } from '../input.js'
 
 export const style = {
   fg: "white",
-  bg: "white",
-  disabledBg: "white",
-  disabledFg: "white",
-  hover: "white",
-  active: "white",
+  bg: "#606060",
+  disabledBg: "#555",
+  disabledFg: "#666",
+  hover: "#7a7a7a",
+  active: "#545454",
 }
 
 

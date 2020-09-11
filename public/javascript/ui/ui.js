@@ -121,12 +121,6 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
 
   if (locPlayer.host) {
     ctx.font = "50px Kumbh Sans, sans-serif";
-    button.style.fg = "white";
-    button.style.bg = "#606060";
-    button.style.disabledBg = "#555";
-    button.style.disabledFg = "#666";
-    button.style.hover = "#7a7a7a";
-    button.style.active = "#545454";
     if (button.drawButton(ctx, "Start", W / 2, H - 130, 250, 80, 0.5, 1, playerCount < 4))
       console.log('start game!!')
   }
