@@ -5,13 +5,22 @@ import { Vector } from './util/Vector.js'
 export const m4 = twgl.m4;
 
 const shaders = {};
+// let shadersLock = false;
 
 export const loadShader = async (path) => { // TODO: cache shaders
   // console.log(shaders)
-  if (shaders[path]) return shaders[path];
+  // console.trace()
+  if (shaders[path]) {
+    console.log("precached shader")
+    return Promise.resolve(shaders[path]);
+  }
+  // console.trace(`Loading shader ${path}...`)
   return fetch(`../shaders/${path}.glsl`).then(async (res) => {
-    console.log(`Loaded shader '${path}'!`)
+    // while (shadersLock);
+    // shadersLock = true;
     shaders[path] = await res.text();
+    // shadersLock = false;
+    console.log(`Loaded shader '${path}'!`)
     return shaders[path]
   }).catch((reason) => {
     console.error(`Failed to load shader '${path}'!`)

@@ -6,6 +6,7 @@ import { gl, ctx, canvas, overlayCanvas, W, H, nametagCanvas, nametagCtx } from 
 import { camera, loadShader } from './render.js'
 import { baseVisibility, gameOptions, gameState } from './state.js'
 import { time } from './game.js'
+import { hookPreload } from './hooks.js'
 
 let sprite;
 let maskSprite;
@@ -14,7 +15,7 @@ let highlightShader;
 let nametagShader;
 let nametagSprite;
 let crownSprite;
-(async () => {
+hookPreload(async () => {
   sprite = await getSprite(gl, "walksprite")
   maskSprite = await getSprite(gl, "walkspriteColor")
   nametagSprite = await getSprite(gl, "pixel")
@@ -22,7 +23,7 @@ let crownSprite;
   playerShader = twgl.createProgramInfo(gl, [await loadShader("v_animSprite"), await loadShader("f_player")])
   highlightShader = twgl.createProgramInfo(gl, [await loadShader("v_animSprite"), await loadShader("f_highlight")])
   nametagShader = twgl.createProgramInfo(gl, [await loadShader("vertex"), await loadShader("f_player")])
-})()
+})
 
 const stepsPerSec = 4.1;
 

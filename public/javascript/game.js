@@ -19,9 +19,12 @@ import { drawUI, tickUI } from './ui/ui.js'
 
 import { locPlayerColl } from './physics.js'
 import { lineIntersect } from './util/raycasts.js'
+import { hookPreload, preloadHooks } from './hooks.js'
 
 /** @type {SocketIO.Socket} */
-const socket = io('/' + sessionStorage.getItem('code'));
+const socket = io('/' + sessionStorage.getItem('code'), {
+  autoConnect: false,
+});
 console.log(`Connecting to room '${sessionStorage.getItem('code')}'`);
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -78,6 +81,7 @@ socket.on('connect', () => {
   socket.on('you', (newPlayer) => {
     locPlayer = new Player(newPlayer);
     locPlayer.isLocal = true;
+    start();
   })
 
   socket.emit('self register', urlParams.get('name') || localStorage.getItem("name"));
@@ -206,9 +210,9 @@ const tex = twgl.createTexture(gl, {
 });
 
 let visibilityShader;
-(async () => {
+hookPreload(async () => {
   visibilityShader = twgl.createProgramInfo(gl, [await loadShader("vertex"), await loadShader("f_visibility")])
-})()
+})
 
 
 
@@ -439,9 +443,9 @@ const draw = async (dt) => {
 
   joystick.drawJoystick();
 
-  drawUI(ctx, dt, socket, playerCount, locPlayer);
 
   ctx.setTransform(1, 0, 0, 1, 0, 0);
+  drawUI(ctx, dt, socket, playerCount, locPlayer);
   ctx.fillStyle = "black";
   ctx.fillRect(input.mousePos.x - 1, input.mousePos.y - 1, 3, 3);
   ctx.fillStyle = "white";
@@ -464,12 +468,45 @@ const draw = async (dt) => {
   //   ctx.fillRect(intersect.x, intersect.y, 5, 5);
   // console.timeEnd("Draw")
 }
+const start = () => {
+  // TODO: maybe not use setInterval? not sure
+  setInterval(() => {
+    if (locPlayer.id)
+      socket.emit('movement update', locPlayer.id, locPlayer.pos, locPlayer.velocity)
+  }, 1000 / 64);
 
-// TODO: maybe not use setInterval? not sure
-setInterval(() => {
-  if (locPlayer.id)
-    socket.emit('movement update', locPlayer.id, locPlayer.pos, locPlayer.velocity)
-}, 1000 / 64);
+  prev = performance.now()
+  window.requestAnimationFrame(tick);
+}
 
-prev = performance.now()
-window.requestAnimationFrame(tick);
+
+
+Promise.all([
+  // VERTEX SHADERS
+  loadShader("vertex"),
+  loadShader("v_animSprite"),
+
+  // FRAGMENT SHADERS
+  loadShader("frag"),
+  loadShader("fragTex"),
+  loadShader("f_highlight"),
+  loadShader("f_player"),
+  loadShader("f_visibility"),
+
+  //SPRITES
+  getSprite(gl, "pixel"),
+  getSprite(gl, "walksprite"),
+  getSprite(gl, "walkspriteColor"),
+  getSprite(gl, "crown"),
+  getSprite(gl, "box"),
+]).then(() => {
+  preloadHooks.forEach(e => {
+    e();
+  });
+
+  console.log("Preload finished. Starting game...")
+  socket.open();
+}).catch(reason => {
+  console.error("Failed to preload shaders/sprites.")
+  console.error(reason)
+})

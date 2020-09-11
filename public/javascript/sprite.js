@@ -2,16 +2,17 @@ import * as twgl from './lib/twgl-full.module.js'
 import { m4, loadShader, camera } from './render.js'
 import { gl } from './canvas.js'
 import { Vector } from './util/Vector.js'
+import { hookPreload } from './hooks.js'
 
 
 export let spriteShader;
 export let spriteSheetShader;
 export let solidProgramInfo;
-(async () => {
+hookPreload(async () => {
   spriteShader = twgl.createProgramInfo(gl, [await loadShader("vertex"), await loadShader("fragTex")])
   spriteSheetShader = twgl.createProgramInfo(gl, [await loadShader("v_animSprite"), await loadShader("fragTex")])
   solidProgramInfo = twgl.createProgramInfo(gl, [await loadShader("vertex"), await loadShader("frag")]);
-})()
+})
 
 export const quadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl);
 
@@ -23,9 +24,7 @@ export const sprites = {};
 
 export const getSprite = (gl, spriteName) => {
   if (sprites[spriteName])
-    return new Promise(resolve => {
-      resolve(sprites[spriteName]);
-    })
+    return Promise.resolve(sprites[spriteName])
   else {
     return new Promise((resolve, reject) => {
       const tex = twgl.createTexture(gl, {
