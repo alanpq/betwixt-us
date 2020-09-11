@@ -133,7 +133,7 @@ export class Vector {
   };
 
   toString = function () {
-    return 'x: ' + this.x + ', y: ' + this.y;
+    return 'x: ' + this.x.toFixed(10) + ', y: ' + this.y.toFixed(10);
   };
 
   toArray = function () {
