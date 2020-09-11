@@ -343,13 +343,6 @@ const drawVisibility = () => { // TODO: convex polygons?
 
 const draw = async (dt) => {
   // console.time("Draw")
-  ctx.fillStyle = "white"
-  ctx.font = "11px monospace"
-  ctx.textAlign = "right"
-  ctx.fillText(locPlayer.pos, W - 10, 10);
-  ctx.fillText(camera.pos, W - 10, 20);
-  ctx.fillText(camera.zoom, W - 10, 30);
-  ctx.fillText((camera.zoom / gl.canvas.width) / 2, W - 10, 40);
   // ctx.fillText(, 10, 40);
   ctx.setTransform(camera.zoom, 0, 0, camera.zoom, -camera.pos.x * camera.zoom, -camera.pos.y * camera.zoom);
 

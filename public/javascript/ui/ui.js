@@ -1,10 +1,13 @@
 import { fillStrokedText } from '../util/util.js'
-import { canvas, overlayCanvas, W, H } from '../canvas.js'
+import { gl, canvas, overlayCanvas, W, H } from '../canvas.js'
 import * as button from './button.js'
 import { gameState } from '../state.js';
+import { camera } from '../render.js';
+import * as input from '../input.js'
 
 export const options = {
-  fpsDisplay: 2, // 0 - off, 1 - fps, 2 - full
+  fpsDisplay: true, // 0 - off, 1 - fps, 2 - full,
+  showPos: true,
 }
 
 
@@ -28,8 +31,51 @@ export const tickUI = (prev, now) => {
   }
 }
 
+let optionsMenuOpen = false;
+let optionsBounds = {
+  w: W * 0.33,
+  h: H * 0.75,
+}
+optionsBounds.x = W / 2 - optionsBounds.w / 2;
+optionsBounds.y = H / 2 - optionsBounds.h / 2;
+
+/**
+ * 
+ * @param {CanvasRenderingContext2D} ctx 
+ */
+const drawOptionsMenu = (ctx) => {
+  input.UnEatMouse();
+  ctx.fillStyle = "#111";
+  ctx.fillRect(optionsBounds.x, optionsBounds.y, optionsBounds.w, optionsBounds.h)
+
+  if (button.drawButton(ctx, "x", optionsBounds.x + optionsBounds.w - 10, optionsBounds.y + 10, 25, 25, 1, 0, false, 0))
+    optionsMenuOpen = false;
+
+  let yOff = 50;
+  const size = optionsBounds.w * 0.075;
+  ctx.fillStyle = "white";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "hanging";
+  ctx.font = `${size * 0.75}px Kumbh Sans, sans-serif`
+  options.fpsDisplay = button.drawCheckbox(ctx, options.fpsDisplay, optionsBounds.x + 10, optionsBounds.y + yOff, size, 0, 0, false)
+  ctx.fillText("FPS Counter", optionsBounds.x + 20 + size, optionsBounds.y + yOff - 5 + size / 2);
+  yOff += size + 5
+
+
+  options.showPos = button.drawCheckbox(ctx, options.showPos, optionsBounds.x + 10, optionsBounds.y + yOff, size, 0, 0, false)
+  ctx.fillText("Show position", optionsBounds.x + 20 + size, optionsBounds.y + yOff - 5 + size / 2);
+  yOff += size + 5
+  ctx.textBaseline = "middle";
+}
+
+
 export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+  if (input.mousePos.x >= optionsBounds.x && input.mousePos.x <= optionsBounds.x + optionsBounds.w && input.mousePos.y >= optionsBounds.y && input.mousePos.y <= optionsBounds.y + optionsBounds.h) {
+    input.EatMouse(); // TODO: better options menu
+  }
+
   ctx.font = "20px monospace";
   ctx.fillStyle = "white";
   ctx.strokeStyle = "black";
@@ -37,12 +83,12 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
   ctx.lineWidth = 0.5;
   ctx.textAlign = "left";
   const avgFrameTime = (frameTimeSum / frameTimeSamples.length);
-  if (options.fpsDisplay == 2) {
-    ctx.fillText(`    Avg Frame Time: ${(avgFrameTime).toPrecision(4)} ms`, 5, 23);
-    ctx.fillText(`Min/Max Frame Time: ${(frameTimeMin).toPrecision(4)}/${(frameTimeMax).toPrecision(4)} ms`, 5, 43);
+  if (options.fpsDisplay) {
+    ctx.fillText(`    Avg Frame Time: ${(avgFrameTime).toPrecision(4)} ms`, 5, 15);
+    ctx.fillText(`Min/Max Frame Time: ${(frameTimeMin).toPrecision(4)}/${(frameTimeMax).toPrecision(4)} ms`, 5, 35);
   }
-  if (options.fpsDisplay >= 1) {
-    ctx.fillText(`${options.fpsDisplay == 2 ? '           ' : ''}Avg FPS: ${(1000 / avgFrameTime).toPrecision(6)} FPS`, 5, 63);
+  if (options.fpsDisplay) {
+    ctx.fillText(`${options.fpsDisplay ? '           ' : ''}Avg FPS: ${(1000 / avgFrameTime).toPrecision(6)} FPS`, 5, 60);
     if (frameTimeSamples[frameTimeI] <= frameTimeMin)
       frameTimeMin = 100000;
     if (frameTimeSamples[frameTimeI] >= frameTimeMax)
@@ -70,23 +116,39 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
 
   if (locPlayer.host) {
     ctx.font = "50px Kumbh Sans, sans-serif";
-    button.style.text = "white";
-    button.style.button = "#606060";
-    button.style.disabled = "#555";
-    button.style.disabledText = "#666";
+    button.style.fg = "white";
+    button.style.bg = "#606060";
+    button.style.disabledBg = "#555";
+    button.style.disabledFg = "#666";
     button.style.hover = "#7a7a7a";
     button.style.active = "#545454";
     if (button.drawButton(ctx, "Start", W / 2, H - 130, 250, 80, 0.5, 1, playerCount < 4))
       console.log('start game!!')
   }
 
+  if (button.drawButton(ctx, "Options", W - 10, 10, 100, 100, 1, 0, false)) {
+    console.log('hi')
+    optionsMenuOpen = !optionsMenuOpen;
+  }
+
   ctx.textAlign = "right";
   ctx.font = "30px Kumbh Sans, sans-serif";
   fillStrokedText(ctx, Math.max(0, gameState.killCounter.toFixed(0)), W - 10, H - 43)
 
-  ctx.fillStyle = "white";
+  ctx.fillStyle = "white"
+  ctx.font = "11px monospace"
+  ctx.textAlign = "right"
+  if (options.showPos) {
+    ctx.fillText(locPlayer.pos, W - 10, 10);
+    ctx.fillText(camera.pos, W - 10, 20);
+    ctx.fillText(camera.zoom, W - 10, 30);
+    ctx.fillText((camera.zoom / gl.canvas.width) / 2, W - 10, 40);
+  }
 
-  // ctx.fillText(["held", "down", "unheld", "up"][mouseState], W / 2, 100);
+  if (optionsMenuOpen)
+    drawOptionsMenu(ctx);
+
+  // ctx.fillText(["held", "down", "down", "unheld", "just unheld", "asdagrhjasgejhasg"][input.mouseState], W / 2, 100);
 
 
   // TODO need a better human to debug this
