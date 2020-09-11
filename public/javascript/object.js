@@ -3,6 +3,7 @@ import * as sprite from './sprite.js'
 import { ctx } from './canvas.js';
 import { AABB } from './util/util.js'
 import { locPlayer } from './game.js'
+import { options } from './ui/ui.js';
 
 // TODO: spacial segregation ;)
 
@@ -61,10 +62,11 @@ export const drawScene = (gl, camera) => {
     gl.stencilFunc(gl.ALWAYS, 0, 0xff);
 
     sprite.drawSprite(gl, object._sprite, object.pos, true)
-    ctx.fillStyle = "rgba(0,0,0,0.1)"
-    ctx.lineWidth = 0.01
-    ctx.strokeRect(object.pos.x + object.bounds.x, object.pos.y + object.bounds.y, object.bounds.w, object.bounds.h);
-
+    if (options.drawCollInfo) {
+      ctx.fillStyle = "rgba(0,0,0,0.1)"
+      ctx.lineWidth = 0.01
+      ctx.strokeRect(object.pos.x + object.bounds.x, object.pos.y + object.bounds.y, object.bounds.w, object.bounds.h);
+    }
     // ctx.fillRect(object.pos.x * gl.canvas.width)
   }
 }

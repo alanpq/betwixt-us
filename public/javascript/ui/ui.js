@@ -8,6 +8,7 @@ import * as input from '../input.js'
 export const options = {
   fpsDisplay: true, // 0 - off, 1 - fps, 2 - full,
   showPos: true,
+  drawCollInfo: false,
 }
 
 
@@ -61,10 +62,14 @@ const drawOptionsMenu = (ctx) => {
   ctx.fillText("FPS Counter", optionsBounds.x + 20 + size, optionsBounds.y + yOff - 5 + size / 2);
   yOff += size + 5
 
-
   options.showPos = button.drawCheckbox(ctx, options.showPos, optionsBounds.x + 10, optionsBounds.y + yOff, size, 0, 0, false)
   ctx.fillText("Show position", optionsBounds.x + 20 + size, optionsBounds.y + yOff - 5 + size / 2);
   yOff += size + 5
+
+  options.drawCollInfo = button.drawCheckbox(ctx, options.drawCollInfo, optionsBounds.x + 10, optionsBounds.y + yOff, size, 0, 0, false)
+  ctx.fillText("Draw collision info", optionsBounds.x + 20 + size, optionsBounds.y + yOff - 5 + size / 2);
+  yOff += size + 5
+
   ctx.textBaseline = "middle";
 }
 
