@@ -99,6 +99,8 @@ export default class Player {
     if (!this.isLocal) {
       // this.clientPos = Vector.lerp(this.clientPos, this.pos, 10 * dt);
       // this.pos.addTo(this.velocity.multiply(dt * gameOptions.player_speed))
+      if (this.dead)
+        this.velocity.x = this.velocity.y = 0
       doPlayerPhysics(this, dt);
     }
   }
