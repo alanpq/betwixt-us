@@ -125,10 +125,8 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
       console.log('start game!!')
   }
 
-  if (button.drawButton(ctx, "Options", W - 10, 10, 100, 100, 1, 0, false)) {
-    console.log('hi')
+  if (button.drawButton(ctx, "Options", W - 10, 10, 100, 100, 1, 0, false))
     optionsMenuOpen = !optionsMenuOpen;
-  }
 
   ctx.textAlign = "right";
   ctx.font = "30px Kumbh Sans, sans-serif";
