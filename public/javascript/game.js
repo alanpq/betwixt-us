@@ -360,6 +360,7 @@ const draw = async (dt) => {
   gl.clearDepth(1);
   gl.clearStencil(0);
   gl.clearColor(0.8, 0.8, 0.8, 1);
+  gl.stencilMask(0xff);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 
 
