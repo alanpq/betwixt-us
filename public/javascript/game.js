@@ -386,7 +386,6 @@ const draw = async (dt) => {
   for (let player of playerList) {
     player.tick(dt);
     player.draw(gl, dt); // TODO: fix these params
-    player.drawNametag(gl); // TODO: fix these params
   }
   if (closestPlayer)
     closestPlayer.drawHighlight(gl, [1, 0, 0, 1]);
@@ -404,12 +403,6 @@ const draw = async (dt) => {
   }, camera.pos, [camera.W, camera.H], spriteShader, {
     u_tint: [0, 0, 0, 0.9]
   })
-
-  gl.enable(gl.DEPTH_TEST);
-  gl.stencilFunc(gl.ALWAYS, 1, 0xff); // ignore stencil buffer (always pass)
-  gl.depthMask(true); // write to depth buffer
-  locPlayer.drawNametag(gl);
-
 
   gl.stencilFunc(gl.NOTEQUAL, 1, 0xff); // pass stencil if stencil == 1
   gl.depthMask(false); // dont write to depth buffer
@@ -430,7 +423,13 @@ const draw = async (dt) => {
   gl.stencilFunc(gl.ALWAYS, 1, 0xff); // ignore stencil buffer (always pass)
   gl.depthMask(true); // write to depth buffer
 
+  locPlayer.drawNametag(gl);
   locPlayer.draw(gl, dt);
+
+  gl.stencilFunc(gl.EQUAL, 0, 0xff); // pass stencil if stencil == 0
+  for (let player of playerList) {
+    player.drawNametag(gl); // TODO: fix these params
+  }
 
   // drawSprite(gl, await getSprite(gl, "pixel"), locPlayer.pos, true, [1, 1, 1, 1], baseVisibility);
 
