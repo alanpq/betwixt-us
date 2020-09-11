@@ -25,7 +25,7 @@ let mouseIsEaten = false; // used for mouse click consuming items (buttons, etc)
  * @return {boolean}
  */
 export const GetLeftMouse = (edible = false) => { // no need for other mouse clicks, we're going for crossplay
-  return mouseState < 3 && (!edible || mouseIsEaten);
+  return mouseState < 3 && (!edible || !mouseIsEaten);
 }
 /**
  * Returns true if the left mouse button has just been pressed.
@@ -33,7 +33,7 @@ export const GetLeftMouse = (edible = false) => { // no need for other mouse cli
  * @return {boolean}
  */
 export const GetLeftMouseDown = (edible = false) => {
-  return mouseState == 1 && (!edible || mouseIsEaten);
+  return mouseState == 1 && (!edible || !mouseIsEaten);
 }
 
 /**
@@ -42,12 +42,18 @@ export const GetLeftMouseDown = (edible = false) => {
  * @return {boolean}
  */
 export const GetLeftMouseUp = (edible = false) => {
-  return mouseState == 4 && (!edible || mouseIsEaten);
+  return mouseState == 4 && (!edible || !mouseIsEaten);
 }
 
 export const EatMouse = () => {
   mouseIsEaten = true;
 }
+
+export const UnEatMouse = () => {
+  mouseIsEaten = false;
+}
+
+
 
 //// TICK
 
