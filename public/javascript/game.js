@@ -200,8 +200,8 @@ const tick = (now) => {
   camera.pos = Vector.lerp(camera.pos, locPlayer.pos.subtract(new Vector(camera.W / 2, camera.H / 2)), 10 * dt);
   // inputInterpreter();
   draw(dt);
-  // inputTick();
   tickUI(prev, performance.now());
+  input.inputTick();
   window.requestAnimationFrame(tick);
 }
 
