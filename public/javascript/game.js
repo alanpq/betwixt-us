@@ -380,16 +380,11 @@ const draw = async (dt) => {
   drawScene(gl, camera);
 
 
-  gl.enable(gl.DEPTH_TEST);
-  gl.stencilFunc(gl.ALWAYS, 1, 0xff); // ignore stencil buffer (always pass)
-  gl.depthMask(true); // write to depth buffer
-
-  locPlayer.draw(gl, dt);
 
   gl.stencilFunc(gl.EQUAL, 0, 0xff); // pass stencil if stencil == 0
 
   for (let player of playerList) {
-    // player.tick(dt);
+    player.tick(dt);
     player.draw(gl, dt); // TODO: fix these params
     player.drawNametag(gl); // TODO: fix these params
   }
@@ -429,6 +424,13 @@ const draw = async (dt) => {
   })
   gl.stencilFunc(gl.ALWAYS, 1, 0xff); // ignore stencil buffer (always pass)
   gl.depthMask(true); // write to depth buffer
+
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.stencilFunc(gl.ALWAYS, 1, 0xff); // ignore stencil buffer (always pass)
+  gl.depthMask(true); // write to depth buffer
+
+  locPlayer.draw(gl, dt);
 
   // drawSprite(gl, await getSprite(gl, "pixel"), locPlayer.pos, true, [1, 1, 1, 1], baseVisibility);
 

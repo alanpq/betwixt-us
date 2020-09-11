@@ -96,7 +96,8 @@ export default class Player {
 
   tick(dt) {
     if (!this.isLocal) {
-      this.clientPos = Vector.lerp(this.clientPos, this.pos, 10 * dt);
+      // this.clientPos = Vector.lerp(this.clientPos, this.pos, 10 * dt);
+      this.clientPos = this.pos;
     }
   }
 
