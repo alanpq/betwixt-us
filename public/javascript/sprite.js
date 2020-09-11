@@ -40,7 +40,10 @@ export const getSprite = (gl, spriteName) => {
 }
 
 export const drawTex = (gl, tex, pos, cameraOff, scale = [1, 1], shader, uniforms = {}) => {
-  if (!shader || !tex || !pos) return;
+  if (!shader)
+    return console.error("Invalid shader!")
+  if (!tex)
+    return console.error("Invalid texture!")
 
 
   const eye = [0, 0, -1];
@@ -78,7 +81,7 @@ export const drawTex = (gl, tex, pos, cameraOff, scale = [1, 1], shader, uniform
  * @param {*} customUniforms 
  */
 export const drawSprite = (gl, sprite, pos, worldSpace = false, tint = [1, 1, 1, 1], scale = [1, 1], customShader = null, customUniforms = {}, customZ = null) => {
-  if (!spriteShader || !sprite || !pos) return;
+  // if (!spriteShader || !sprite || !pos) return;
   const uniforms = {
     u_tint: tint,
     u_cutThreshold: 1,
@@ -120,7 +123,7 @@ export const drawSprite = (gl, sprite, pos, worldSpace = false, tint = [1, 1, 1,
  * @param {*} customUniforms 
  */
 export const drawSpriteSheet = (gl, spriteSheet, frame, framesPerRow, frames, pos, worldSpace = false, tint = [1, 1, 1, 1], scale = [1, 1], customUniforms = {}) => {
-  if (!spriteSheetShader) return;
+  // if (!spriteSheetShader) return;
   const uniforms = {
     u_tint: tint,
     u_frameOffset: frame,
