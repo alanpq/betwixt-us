@@ -7,6 +7,7 @@ import { camera, loadShader } from './render.js'
 import { baseVisibility, gameOptions, gameState } from './state.js'
 import { time } from './game.js'
 import { hookPreload } from './hooks.js'
+import { doPlayerPhysics } from './physics.js'
 
 let sprite;
 let maskSprite;
@@ -97,7 +98,8 @@ export default class Player {
   tick(dt) {
     if (!this.isLocal) {
       // this.clientPos = Vector.lerp(this.clientPos, this.pos, 10 * dt);
-      this.clientPos = this.pos;
+      // this.pos.addTo(this.velocity.multiply(dt * gameOptions.player_speed))
+      doPlayerPhysics(this, dt);
     }
   }
 
@@ -125,10 +127,9 @@ export default class Player {
       gl.disable(gl.STENCIL_TEST)
     gl.depthMask(true);
     // gl.stencilFunc(gl.NEVER, 1, 0xff);
-    const pos = (this.isLocal ? this.pos : this.clientPos); // todo: cache this one maybe
     drawTex(gl, this.nametag, {
-      x: pos.x - origin.x,
-      y: pos.y - origin.y - 1.45,
+      x: this.pos.x - origin.x,
+      y: this.pos.y - origin.y - 1.45,
       z: 51,
     }, camera.pos, [-nametagCanvas.width / (camera.zoom * 2), nametagCanvas.height / (camera.zoom * 2)], nametagShader, {
       u_lightPosition: [W / 2, H / 2],
@@ -142,8 +143,8 @@ export default class Player {
     });
     if (this.host)
       drawTex(gl, crownSprite, {
-        x: pos.x - origin.x,
-        y: pos.y - origin.y - 1.75 - nametagCanvas.height / (camera.zoom * 2),
+        x: this.pos.x - origin.x,
+        y: this.pos.y - origin.y - 1.75 - nametagCanvas.height / (camera.zoom * 2),
         z: 50,
       }, camera.pos, [0.25, 0.25], spriteShader, {
         u_lightPosition: [W / 2, H / 2],
@@ -163,9 +164,8 @@ export default class Player {
    */
   drawHighlight(gl, color = [1, 1, 1, 1]) {
     gl.enable(gl.DEPTH_TEST);
-    const pos = (this.isLocal ? this.pos : this.clientPos);
     drawSprite(gl, sprite,
-      pos.add(new Vector(0, -this.b * 0.4 * this.moving)).subtract(origin), // add vertical offset based on cycle function
+      this.pos.add(new Vector(0, -this.b * 0.4 * this.moving)).subtract(origin), // add vertical offset based on cycle function
       true,
       color,
       [(this.facing * 2 - 1) * 1.1, 1.1],
@@ -178,7 +178,7 @@ export default class Player {
         u_spritesPerRow: 5,
         u_numFrames: 5,
         u_cutThreshold: 1,
-      }, -pos.y + 0.01)
+      }, -this.pos.y + 0.01)
   }
 
   /**
@@ -199,7 +199,7 @@ export default class Player {
       this.walkCycle = this.walkCycle > 3 ? 1 : this.walkCycle + 1;
 
     drawSprite(gl, sprite,
-      (this.isLocal ? this.pos : this.clientPos).add(new Vector(0, -this.b * 0.4 * this.moving)).subtract(origin), // add vertical offset based on cycle function
+      this.pos.add(new Vector(0, -this.b * 0.4 * this.moving)).subtract(origin), // add vertical offset based on cycle function
       true,
       this.dead ? [...colors[this.color].slice(0, 3).map((v, i, a) => {
         return v * 0.5;

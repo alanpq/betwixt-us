@@ -10,17 +10,17 @@ import { options } from './ui/ui.js'
 
 /**
  * 
- * @param {Player} locPlayer Player
+ * @param {Player} player Player
  * @param {*} prevPos 
  */
-export const locPlayerColl = (locPlayer, dt) => { // FIXME: perfect edge intersections allow players to glitch through
+export const doPlayerPhysics = (player, dt) => { // FIXME: perfect edge intersections allow players to glitch through
   // const ray = new Ray(locPlayer.pos, mousePos.subtract(new Vector(W / 2, H / 2)));
-  const vel = new Vector(locPlayer.velocity.x, locPlayer.velocity.y);
+  const vel = new Vector(player.velocity.x, player.velocity.y);
   // let vel = mousePos.subtract(new Vector(W / 2, H / 2));
   // vel.multiplyBy(1 * dt);
   vel.multiplyBy(gameOptions.player_speed);
 
-  const ray = new Ray(locPlayer.pos, vel.multiply(dt));
+  const ray = new Ray(player.pos, vel.multiply(dt));
 
   ctx.setTransform(camera.zoom, 0, 0, camera.zoom, -camera.pos.x * camera.zoom, -camera.pos.y * camera.zoom);
   if (options.drawCollInfo) {
@@ -64,16 +64,16 @@ export const locPlayerColl = (locPlayer, dt) => { // FIXME: perfect edge interse
 
         ctx.fillStyle = "black";
         ctx.font = "0.5px monospace";
-        ctx.fillText(dp.toFixed(2), locPlayer.pos.x, locPlayer.pos.y);
+        ctx.fillText(dp.toFixed(2), player.pos.x, player.pos.y);
         ctx.strokeStyle = "rgba(0,255,0,0.5)";
         ctx.beginPath()
-        ctx.moveTo(locPlayer.pos.x, locPlayer.pos.y)
+        ctx.moveTo(player.pos.x, player.pos.y)
         ctx.lineTo(hit.point.x + vel.x, hit.point.y + vel.y);
         ctx.stroke();
       }
     }
   }
 
-  locPlayer.pos.addTo(vel.multiply(dt))
+  player.pos.addTo(vel.multiply(dt))
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 }

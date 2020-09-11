@@ -17,7 +17,7 @@ import { baseVisibility, gameOptions, gameState } from './state.js'
 import { drawUI, tickUI } from './ui/ui.js'
 // twgl.setDefaults({ attribPrefix: "a_" });
 
-import { locPlayerColl } from './physics.js'
+import { doPlayerPhysics } from './physics.js'
 import { lineIntersect } from './util/raycasts.js'
 import { hookPreload, preloadHooks } from './hooks.js'
 
@@ -175,7 +175,7 @@ const tick = (now) => {
     //   locPlayer.velocity = new Vector(0, 0);
 
 
-    locPlayerColl(locPlayer, dt);
+    doPlayerPhysics(locPlayer, dt);
 
 
     playerList = Object.values(players);
@@ -468,7 +468,7 @@ const start = () => {
   setInterval(() => {
     if (locPlayer.id)
       socket.emit('movement update', locPlayer.id, locPlayer.pos, locPlayer.velocity)
-  }, 1000 / 64);
+  }, 1000 / 20);
 
   prev = performance.now()
   window.requestAnimationFrame(tick);
