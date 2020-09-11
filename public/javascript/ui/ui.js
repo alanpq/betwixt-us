@@ -1,6 +1,6 @@
 import { fillStrokedText } from '../util/util.js'
 import { canvas, overlayCanvas, W, H } from '../canvas.js'
-import { drawButton } from './button.js'
+import * as button from './button.js'
 import { gameState } from '../state.js';
 
 export const options = {
@@ -65,16 +65,18 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
   // TODO: use non canvas HUD overlay for finer text control?
   fillStrokedText(ctx, socket.nsp.slice(1), W / 2, H - 43);
   ctx.font = "30px Kumbh Sans, sans-serif";
+  ctx.fillStyle = playerCount < 4 ? "#ff0000" : "#00ff00"
   fillStrokedText(ctx, `${playerCount}/10`, W / 2, H - 93);
 
   if (locPlayer.host) {
     ctx.font = "50px Kumbh Sans, sans-serif";
-    ctx.fillStyle = "white";
-    ctx.buttonStyle = "#606060";
-    ctx.disabledStyle = "#555555";
-    ctx.hoverStyle = "#7a7a7a";
-    ctx.activeStyle = "#545454";
-    if (drawButton(ctx, "Start", W / 2, H - 130, 250, 80, 0.5, 1, playerCount < 4))
+    button.style.text = "white";
+    button.style.button = "#606060";
+    button.style.disabled = "#555";
+    button.style.disabledText = "#666";
+    button.style.hover = "#7a7a7a";
+    button.style.active = "#545454";
+    if (button.drawButton(ctx, "Start", W / 2, H - 130, 250, 80, 0.5, 1, playerCount < 4))
       console.log('start game!!')
   }
 
@@ -90,8 +92,6 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
   // TODO need a better human to debug this
   // ctx.drawImage(randomUiFunc(), 0, 0)
   // ctx.drawImage(scoreCanvas, 0, 0)
-  // joystick goes main layer
-  // drawJoystick(ctx, dt);
 }
 
 const randomUiFunc = () => {

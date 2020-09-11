@@ -1,3 +1,15 @@
+import { mousePos } from '../input.js'
+
+export const style = {
+  text: "white",
+  button: "white",
+  disabled: "white",
+  hover: "white",
+  active: "white",
+}
+
+
+
 /**
  * Draws a button at a specified point. Colours can be customized with ctx.fillStyle, ctx.hoverStyle, ctx.activeStyle. Returns true if the button has been pressed
  * @param {CanvasRenderingContext2D} ctx The canvas rendering context
@@ -16,12 +28,11 @@ export const drawButton = (ctx, text, x, y, w, h, anchorX = 0, anchorY = 0, disa
     y: y - (h * anchorY)
   }
   let clicked = false;
-  let style = ctx.fillStyle;
-  ctx.fillStyle = ctx.buttonStyle;
+  ctx.fillStyle = style.button;
   if (disabled) {
-    ctx.fillStyle = ctx.disabledStyle;
+    ctx.fillStyle = style.disabled;
   } else if (mousePos.x >= bb.x && mousePos.x <= bb.x + w && mousePos.y >= bb.y && mousePos.y <= bb.y + h) {
-    ctx.fillStyle = GetLeftMouse() ? ctx.activeStyle : ctx.hoverStyle;
+    ctx.fillStyle = GetLeftMouse() ? style.active : style.hover;
     if (GetLeftMouseUp())
       clicked = true;
   }
@@ -29,7 +40,7 @@ export const drawButton = (ctx, text, x, y, w, h, anchorX = 0, anchorY = 0, disa
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillRect(bb.x, bb.y, w, h);
-  ctx.fillStyle = style;
+  ctx.fillStyle = disabled ? style.disabledText : style.text;
   ctx.fillText(text, bb.x + w / 2, bb.y + 5 + h / 2, w);
   return clicked;
 }
