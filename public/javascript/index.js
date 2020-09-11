@@ -45,3 +45,14 @@ const createRoom = () => {
     }
   );
 }
+
+dom_name.onkeypress = (e) => {
+  if (e.keyCode != 13 || !dom_name.validity.valid) return;
+  dom_roomID.focus();
+}
+
+
+dom_roomID.onkeypress = (e) => {
+  if (e.keyCode != 13 || !dom_roomID.validity.valid) return;
+  joinRoom();
+}
