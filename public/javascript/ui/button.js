@@ -23,7 +23,7 @@ export const style = {
  * @param {number} anchorY Y position of anchor point [0-1]
  * @returns {boolean} Whether the button has been pressed.
  */
-export const drawButton = (ctx, text, x, y, w, h, anchorX = 0, anchorY = 0, disabled = false) => {
+export const drawButton = (ctx, text, x, y, w, h, anchorX = 0, anchorY = 0, disabled = false, textOff = 5) => {
   const bb = {
     x: x - (w * anchorX),
     y: y - (h * anchorY)
@@ -42,7 +42,7 @@ export const drawButton = (ctx, text, x, y, w, h, anchorX = 0, anchorY = 0, disa
   ctx.textBaseline = "middle";
   ctx.fillRect(bb.x, bb.y, w, h);
   ctx.fillStyle = disabled ? style.disabledFg : style.fg;
-  ctx.fillText(text, bb.x + w / 2, bb.y + 5 + h / 2, w);
+  ctx.fillText(text, bb.x + w / 2, bb.y + textOff + h / 2, w);
   return clicked;
 }
 
