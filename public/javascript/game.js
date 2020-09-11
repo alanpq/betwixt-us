@@ -391,12 +391,13 @@ const draw = async (dt) => {
 
   gl.stencilFunc(gl.EQUAL, 0, 0xff); // pass stencil if stencil == 0
 
-  if (closestPlayer)
-    closestPlayer.drawHighlight(gl, [1, 0, 0, 1]);
   for (let player of playerList) {
+    player.tick(dt);
     player.draw(gl, dt); // TODO: fix these params
     player.drawNametag(gl); // TODO: fix these params
   }
+  if (closestPlayer)
+    closestPlayer.drawHighlight(gl, [1, 0, 0, 1]);
 
   gl.stencilFunc(gl.EQUAL, 1, 0xff);
   gl.depthMask(false); // dont write to depth buffer
