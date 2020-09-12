@@ -11,6 +11,7 @@ import { loadShader, camera } from './render.js'
  * @property {string} name
  * @property {Vector} pos
  * @property {string} sprite
+ * @property {any} interactCB
  */
 
 /** @type {Interactable[]} */
@@ -29,6 +30,7 @@ hookPreload(async () => {
 export const addInteractable = async (interactable, cb) => {
     interactable._sprite = await sprite.getSprite(gl, interactable.sprite)
     interactable.id = interactables.length;
+    interactable.interactCB = cb;
     interactables.push(interactable);
     return interactable;
 }
@@ -38,7 +40,7 @@ export const drawInteractables = () => {
         gl.stencilMask(0x00);
         gl.stencilFunc(gl.ALWAYS, 0, 0xff);
 
-        drawHighlight(obj.id, [1, 0, 0, 1]);
+        // drawHighlight(obj.id, [1, 0, 0, 1]);
         sprite.drawSprite(gl, obj._sprite, obj.pos, true)
     }
 }
@@ -50,6 +52,7 @@ export const drawInteractables = () => {
  */
 export const drawHighlight = (interactableID, tint) => {
     const obj = interactables[interactableID]
+    if (!obj) return;
     // gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.DEPTH_TEST);
     gl.depthMask(false);

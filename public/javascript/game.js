@@ -20,7 +20,7 @@ import { drawUI, tickUI } from './ui/ui.js'
 import { doPlayerPhysics } from './physics.js'
 import { lineIntersect } from './util/raycasts.js'
 import { hookPreload, preloadHooks } from './hooks.js'
-import { drawInteractables, addInteractable } from './interactables.js'
+import { drawInteractables, addInteractable, interactables, drawHighlight } from './interactables.js'
 
 /** @type {SocketIO.Socket} */
 const socket = io('/' + sessionStorage.getItem('code'), {
@@ -127,8 +127,8 @@ addObject(gl, {
 addInteractable({
   pos: new Vector(-1, -1),
   sprite: "laptop",
-}, () => {
-
+}, (self) => {
+  console.log('interact!!')
 });
 
 /** @type {{[id: string] : Player}} */
@@ -143,6 +143,9 @@ let playerList;
 
 /** @type {Player} */
 let closestPlayer = null;
+
+/** @type {number} */
+let closestInteractable = -1;
 
 let prev;
 const tick = (now) => {
@@ -191,12 +194,27 @@ const tick = (now) => {
     closestPlayer = null;
     let min = gameOptions.kill_range;
     for (let player of playerList) {
-      const d = Math.abs(player.pos.subtract(locPlayer.pos).getLength());
+      const d = player.pos.subtract(locPlayer.pos).getSqrtMagnitude();
       if (d < min && !player.dead) {
         min = d;
         closestPlayer = player;
       }
     }
+
+    min = gameOptions.interactable_range;
+    closestInteractable = -1;
+    for (let interactable of interactables) {
+      const d = interactable.pos.subtract(locPlayer.pos).getSqrtMagnitude();
+      if (d < min) {
+        min = d;
+        closestInteractable = interactable.id;
+      }
+    }
+
+    if (closestInteractable != -1 && input.getKeyCode(69)) {
+      interactables[closestInteractable].interactCB(interactables[closestInteractable]);
+    }
+
 
     if (closestPlayer && input.getKeyCode(69) && gameState.killCounter <= 0) {
       gameState.killCounter = gameOptions.kill_counter;
@@ -399,6 +417,7 @@ const draw = async (dt) => {
     closestPlayer.drawHighlight(gl, [1, 0, 0, 1]);
 
   gl.disable(gl.DEPTH_TEST)
+  drawHighlight(closestInteractable, [1, 1, 1, 1]);
   drawInteractables();
   gl.enable(gl.DEPTH_TEST)
 
