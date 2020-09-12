@@ -355,7 +355,6 @@ const draw = async (dt) => {
   // twgl.resizeCanvasToDisplaySize(gl.canvas);
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  gl.stencilMask(0); // disable writing to stencil buffer
 
   gl.clearDepth(1);
   gl.clearStencil(0);
