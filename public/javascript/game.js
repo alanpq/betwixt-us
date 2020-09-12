@@ -20,6 +20,7 @@ import { drawUI, tickUI } from './ui/ui.js'
 import { doPlayerPhysics } from './physics.js'
 import { lineIntersect } from './util/raycasts.js'
 import { hookPreload, preloadHooks } from './hooks.js'
+import { drawInteractables, addInteractable } from './interactables.js'
 
 /** @type {SocketIO.Socket} */
 const socket = io('/' + sessionStorage.getItem('code'), {
@@ -121,6 +122,13 @@ addObject(gl, {
     w: 1.7,
     h: 1,
   }
+});
+
+addInteractable({
+  pos: new Vector(-1, -1),
+  sprite: "laptop",
+}, () => {
+
 });
 
 /** @type {{[id: string] : Player}} */
@@ -389,6 +397,10 @@ const draw = async (dt) => {
   }
   if (closestPlayer)
     closestPlayer.drawHighlight(gl, [1, 0, 0, 1]);
+
+  gl.disable(gl.DEPTH_TEST)
+  drawInteractables();
+  gl.enable(gl.DEPTH_TEST)
 
   gl.stencilFunc(gl.EQUAL, 1, 0xff);
   gl.depthMask(false); // dont write to depth buffer
