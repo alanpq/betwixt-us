@@ -82,7 +82,7 @@ workspaces.on('connection', (socket: socketio.Socket) => {
     // Create this new player
     const player: Player = {
       id: uuid(),
-      pos: { x: 0, y: 0 },
+      pos: { x: (Math.random() * 10) - 5, y: (Math.random() * 10 - 5) },
       velocity: { x: 0, y: 0 },
       name,
       dead: false,
