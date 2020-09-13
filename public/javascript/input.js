@@ -2,13 +2,25 @@ import { Vector } from './util/Vector.js'
 
 //// KEYBOARD
 
-export const keyState = {};
-
+export const keyState = {}; // 0 - held, 1 - just down, 2 - just down, 3 - released, 4 - just released, 5 - just released
+let dirtyKeys = [];
 
 export const joystick = new Vector(0, 0);
 
+const getSafeKeyCode = (key) => {
+  return keyState[key] != undefined ? keyState[key] : 3;
+}
+
 export const getKeyCode = (key) => {
-  return keyState[key] || false;
+  return getSafeKeyCode(key) < 3;
+}
+
+export const getKeyCodeDown = (key) => {
+  return getSafeKeyCode(key) == 1;
+}
+
+export const getKeyCodeUp = (key) => {
+  return getSafeKeyCode(key) == 4;
 }
 
 //// MOUSE/TOUCH
@@ -72,6 +84,26 @@ export const inputTick = () => {
       mouseState = 4;
       break;
   }
+  // if (dirtyKeys)
+  //   console.log(dirtyKeys)
+  dirtyKeys.forEach((code, i, arr) => { // 0 - held, 1 - just down, 2 - just down, 3 - released, 4 - just released, 5 - just released
+    switch (keyState[code]) {
+      case 1:
+        keyState[code] = 0;
+        dirtyKeys.splice(i, 1);
+        break;
+      case 2:
+        keyState[code] = 1;
+        break;
+      case 4:
+        keyState[code] = 3;
+        dirtyKeys.splice(i, 1);
+        break;
+      case 5:
+        keyState[code] = 4;
+        break;
+    }
+  })
   mouseIsEaten = false;
 }
 
@@ -80,11 +112,14 @@ export const inputTick = () => {
 
 // KEYBOARD
 window.addEventListener('keydown', (e) => {
-  keyState[e.keyCode] = true;
+  if (e.repeat) return;
+  keyState[e.keyCode] = 2;
+  dirtyKeys.push(e.keyCode)
 })
 
 window.addEventListener('keyup', (e) => {
-  keyState[e.keyCode] = false;
+  keyState[e.keyCode] = 5;
+  dirtyKeys.push(e.keyCode)
 })
 
 // MOUSE

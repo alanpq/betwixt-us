@@ -211,12 +211,14 @@ const tick = (now) => {
       }
     }
 
-    if (closestInteractable != -1 && input.getKeyCode(69)) {
+    if (closestInteractable != -1 && input.getKeyCodeDown(69)) {
       interactables[closestInteractable].interactCB(interactables[closestInteractable]);
     }
 
+    // console.log(input.keyState[65]);
 
-    if (closestPlayer && input.getKeyCode(69) && gameState.killCounter <= 0) {
+
+    if (closestPlayer && input.getKeyCodeDown(69) && gameState.killCounter <= 0) {
       gameState.killCounter = gameOptions.kill_counter;
       socket.emit('kill', closestPlayer.id)
       console.log('kill')
