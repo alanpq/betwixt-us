@@ -150,7 +150,7 @@ export default class Player {
         z: 50,
       }, camera.pos, [0.25, 0.25], spriteShader, {
         u_lightPosition: [W / 2, H / 2],
-        u_radius: baseVisibility * camera.zoom,
+        u_radius: baseVisibility * gameOptions.crew_visibility * camera.zoom,
         u_tint: [1, 1, 1, 1],
         u_cutThreshold: 0,
       });

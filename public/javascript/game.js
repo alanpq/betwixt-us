@@ -409,7 +409,7 @@ const draw = async (dt) => {
     z: -50,
   }, camera.pos, [camera.W, camera.H], visibilityShader, {
     u_lightPosition: [W / 2, H / 2],
-    u_radius: baseVisibility * camera.zoom,
+    u_radius: baseVisibility * gameOptions.crew_visibility * camera.zoom,
     u_tint: [0, 0, 0, 0.9],
   })
   gl.stencilFunc(gl.ALWAYS, 1, 0xff); // ignore stencil buffer (always pass)
