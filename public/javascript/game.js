@@ -22,6 +22,7 @@ import { lineIntersect } from './util/raycasts.js'
 import { hookPreload, preloadHooks } from './hooks.js'
 import { drawInteractables, addInteractable, interactables, drawHighlight } from './interactables.js'
 import { socket } from './socket.js'
+import { wireTask } from './tasks.js'
 
 const urlParams = new URLSearchParams(window.location.search);
 
@@ -164,7 +165,7 @@ const tick = (now) => {
     closestPlayer = null;
     let min = gameOptions.kill_range;
     for (let player of playerList) {
-      const d = player.pos.subtract(locPlayer.pos).getSqrtMagnitude();
+      const d = player.pos.subtract(locPlayer.pos).getSqrMagnitude();
       if (d < min && !player.dead) {
         min = d;
         closestPlayer = player;
@@ -513,6 +514,11 @@ const start = async () => {
   }, (self) => {
     openWindow("gameOptions")
   });
+
+  addInteractable({
+    pos: new Vector(-1, 2),
+    sprite: 'wire-panel',
+  }, wireTask)
 
   interactables[laptop].disabled = !locPlayer.host
 
