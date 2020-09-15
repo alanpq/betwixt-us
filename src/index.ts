@@ -111,6 +111,10 @@ workspaces.on('connection', (socket: socketio.Socket) => {
       socket.broadcast.volatile.emit('movement update', id, pos, vel);
     })
 
+    socket.on('gameOptions', (options) => {
+      socket.broadcast.emit('gameOptions', options) // TODO: validate this
+    })
+
     socket.on('disconnect', () => {
       socket.broadcast.emit('player leave', player.id)
       delete room.players[player.id]

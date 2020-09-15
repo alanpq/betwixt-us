@@ -4,6 +4,7 @@ import * as button from './button.js'
 import { gameState, gameOptions } from '../state.js';
 import { camera } from '../render.js';
 import * as input from '../input.js'
+import { socket } from '../socket.js';
 
 export const options = {
   fpsDisplay: true, // 0 - off, 1 - fps, 2 - full,
@@ -120,6 +121,7 @@ const drawGameOptions = () => {
 
   if (button.dirty) {
     console.log("Sending new game options to server...");
+    socket.emit('gameOptions', gameOptions)
     recalculateResVars();
   }
 

@@ -74,6 +74,12 @@ socket.on('connect', () => {
     players[id].moving = vel.x < -0.05 || vel.x > 0.05 || vel.y < -0.05 || vel.y > 0.05
   })
 
+  socket.on('gameOptions', (options) => {
+    for (let opt of Object.keys(options)) {
+      gameOptions[opt] = options[opt];
+    }
+  })
+
   socket.on('you', (newPlayer) => {
     locPlayer = new Player(newPlayer);
     locPlayer.isLocal = true;
