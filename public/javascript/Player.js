@@ -135,7 +135,7 @@ export default class Player {
       z: 51,
     }, camera.pos, [-nametagCanvas.width / (camera.zoom * 2), nametagCanvas.height / (camera.zoom * 2)], nametagShader, {
       u_lightPosition: [W / 2, H / 2],
-      u_radius: baseVisibility * camera.zoom,
+      u_radius: baseVisibility * gameOptions.crew_visibility * camera.zoom,
       u_colorTexture: nametagSprite,
       u_tint: [1, 1, 1, 0],
       u_cutThreshold: 0,
