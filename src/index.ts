@@ -14,6 +14,7 @@ import Room from './Room';
 import { v4 as uuid } from 'uuid';
 
 import Player from './game/IPlayer';
+import GameSettings from './GameSettings';
 
 app.use('/', express.static(path.join(__dirname, "..", "public")))
 
@@ -92,6 +93,7 @@ workspaces.on('connection', (socket: socketio.Socket) => {
       lastUpdate: -1,
     };
     socket.emit('you', player); // send new player themselves (meta)
+    socket.emit('gameOptions', room.settings) // send new player the game settings
     socket.broadcast.emit('new player', player); // send new player to all existing players
 
     for (let pl of playerList) { // send all existing players to new player
@@ -111,7 +113,12 @@ workspaces.on('connection', (socket: socketio.Socket) => {
       socket.broadcast.volatile.emit('movement update', id, pos, vel);
     })
 
-    socket.on('gameOptions', (options) => {
+    socket.on('gameOptions', (options: GameSettings) => {
+      room.settings.crew_visibility = options.crew_visibility
+      room.settings.interactable_range = options.interactable_range
+      room.settings.kill_counter = options.kill_counter
+      room.settings.kill_range = options.kill_range
+      room.settings.player_speed = options.player_speed
       socket.broadcast.emit('gameOptions', options) // TODO: validate this
     })
 

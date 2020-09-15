@@ -22,6 +22,13 @@ export default class Room {
 
   constructor() {
     this.code = generateRoomCode();
+    this.settings = {
+      crew_visibility: 1,
+      kill_range: 1.75,
+      kill_counter: 1,
+      interactable_range: 1.75,
+      player_speed: 5,
+    };
     this.players = {};
   }
 }
