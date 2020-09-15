@@ -103,11 +103,11 @@ const drawGameOptions = () => {
   ctx.font = `${optionsBounds.w * 0.075 * 0.7}px Kumbh Sans, sans-serif`
   button.clean();
 
-  gameOptions.player_speed = drawNumber(gameOptions.player_speed, optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 0.25)
+  gameOptions.player_speed = drawNumber(Math.max(gameOptions.player_speed, 1), optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 0.25)
   ctx.fillText("Player Speed", optionsBounds.x + 20, optionsBounds.y + yOff);
   yOff += size + 5
 
-  gameOptions.crew_visibility = drawNumber(gameOptions.crew_visibility, optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 0.25)
+  gameOptions.crew_visibility = drawNumber(Math.max(gameOptions.crew_visibility, 1), optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 0.25)
   ctx.fillText("Innocent Visibility", optionsBounds.x + 20, optionsBounds.y + yOff);
   yOff += size + 5
 
@@ -115,7 +115,7 @@ const drawGameOptions = () => {
   ctx.fillText("Kill Counter", optionsBounds.x + 20, optionsBounds.y + yOff);
   yOff += size + 5
 
-  gameOptions.kill_range = drawNumber(gameOptions.kill_range, optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 5)
+  gameOptions.kill_range = drawNumber(Math.max(1.75, gameOptions.kill_range), optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 5)
   ctx.fillText("Kill Range", optionsBounds.x + 20, optionsBounds.y + yOff);
   yOff += size + 5
 
