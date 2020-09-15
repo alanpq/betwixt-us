@@ -92,6 +92,8 @@ workspaces.on('connection', (socket: socketio.Socket) => {
       lastKill: -1,
       lastUpdate: -1,
     };
+    if (playerList.length === 0)
+      room.host = player.id
     socket.emit('you', player); // send new player themselves (meta)
     socket.emit('gameOptions', room.settings) // send new player the game settings
     socket.broadcast.emit('new player', player); // send new player to all existing players
@@ -125,6 +127,14 @@ workspaces.on('connection', (socket: socketio.Socket) => {
     socket.on('disconnect', () => {
       socket.broadcast.emit('player leave', player.id)
       delete room.players[player.id]
+      const ids = Object.keys(room.players);
+      if (ids.length <= 0) {
+        delete roomCodes[room.code]
+      } else if (player.id == room.host) {
+        room.host = ids[0]
+        room.players[room.host].host = true
+        workspaces.emit('host', room.host)
+      }
     })
 
     room.players[player.id] = player;

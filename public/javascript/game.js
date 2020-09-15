@@ -27,6 +27,8 @@ const urlParams = new URLSearchParams(window.location.search);
 
 const isMobile = mobileCheck();
 
+let laptop;
+
 socket.on('connect', () => {
   socket.on('new player', newPlayer => {
     const player = new Player(newPlayer);
@@ -72,6 +74,15 @@ socket.on('connect', () => {
       players[id].facing = vel.x > 0
 
     players[id].moving = vel.x < -0.05 || vel.x > 0.05 || vel.y < -0.05 || vel.y > 0.05
+  })
+
+  socket.on('host', id => {
+    console.log(id)
+    if (locPlayer.id == id) {
+      locPlayer.host = true;
+      interactables[laptop].disabled = false;
+    } else
+      players[id].host = true;
   })
 
   socket.on('gameOptions', (options) => {
@@ -495,7 +506,7 @@ const start = async () => {
     }
   });
 
-  const laptop = await addInteractable({
+  laptop = await addInteractable({
     pos: new Vector(-1, -1),
     sprite: "laptop",
   }, (self) => {
