@@ -52,7 +52,6 @@ export const textureFromCanvas = (gl, canvas, type) => {
   return texture;
 }
 
-// TODO: real colours
 export const colors = [
   [140 / 255, 252 / 255, 60 / 255, 1],  // green
   [60 / 255, 252 / 255, 233 / 255, 1],  // blue
