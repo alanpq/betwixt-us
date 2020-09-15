@@ -33,7 +33,7 @@ export const resizeHooks = [];
 export var W, H;
 export var minAxis;
 var WSF, HSF;
-const resizeCanvas = () => {
+export const resizeCanvas = () => {
   W = canvas.width = overlayCanvas.width = (window.innerWidth || document.body.clientWidth);
   H = canvas.height = overlayCanvas.height = (window.innerHeight || document.body.clientHeight);
   minAxis = Math.min(W, H);
@@ -45,10 +45,14 @@ const resizeCanvas = () => {
 
   WSF = W / 355;
   HSF = H / 600;
-  if (camera)
-    camera.zoom = (minAxis * 0.45) / (baseVisibility * gameOptions.crew_visibility);
+  recalculateResVars();
   for (let hook of resizeHooks)
     hook();
+}
+
+export const recalculateResVars = () => {
+  if (camera)
+    camera.zoom = (minAxis * 0.45) / Math.max(baseVisibility * gameOptions.crew_visibility, 8);
 }
 resizeCanvas();
 

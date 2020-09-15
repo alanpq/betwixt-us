@@ -1,5 +1,5 @@
 import { fillStrokedText } from '../util/util.js'
-import { gl, canvas, overlayCanvas, ctx, W, H, minAxis } from '../canvas.js'
+import { gl, canvas, overlayCanvas, ctx, W, H, minAxis, resizeCanvas, recalculateResVars } from '../canvas.js'
 import * as button from './button.js'
 import { gameState, gameOptions } from '../state.js';
 import { camera } from '../render.js';
@@ -120,6 +120,7 @@ const drawGameOptions = () => {
 
   if (button.dirty) {
     console.log("Sending new game options to server...");
+    recalculateResVars();
   }
 
   ctx.textBaseline = "middle";
