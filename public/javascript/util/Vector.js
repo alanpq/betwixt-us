@@ -33,10 +33,10 @@ export class Vector {
    */
   getMagnitude() {
     // use pythagoras theorem to work out the magnitude of the vector
-    return Math.sqrt(this.getSqrtMagnitude());
+    return Math.sqrt(this.getSqrMagnitude());
   };
 
-  getSqrtMagnitude() {
+  getSqrMagnitude() {
     return this.x * this.x + this.y * this.y
   }
 
