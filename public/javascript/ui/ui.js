@@ -32,7 +32,7 @@ export const tickUI = (prev, now) => {
   }
 }
 
-let optionsMenuOpen = false;
+let dialogueOpen = false;
 let optionsBounds = {
   w: W * 0.33,
   h: H * 0.75,
@@ -50,7 +50,7 @@ const drawOptionsMenu = (ctx) => {
   ctx.fillRect(optionsBounds.x, optionsBounds.y, optionsBounds.w, optionsBounds.h)
 
   if (button.drawButton(ctx, "x", optionsBounds.x + optionsBounds.w - 10, optionsBounds.y + 10, 25, 25, 1, 0, false, 0))
-    optionsMenuOpen = false;
+    dialogueOpen = false;
 
   let yOff = 50;
   const size = optionsBounds.w * 0.075;
@@ -81,7 +81,7 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
     input.EatMouse(); // TODO: better options menu
   }
 
-  ctx.font = "20px monospace";
+  ctx.font = "20px 'Roboto Mono'";
   ctx.fillStyle = "white";
   ctx.strokeStyle = "black";
 
@@ -126,14 +126,14 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
   }
 
   if (button.drawButton(ctx, "Options", W - 10, 10, 100, 100, 1, 0, false))
-    optionsMenuOpen = !optionsMenuOpen;
+    dialogueOpen = !dialogueOpen;
 
   ctx.textAlign = "right";
   ctx.font = "30px Kumbh Sans, sans-serif";
   fillStrokedText(ctx, Math.max(0, gameState.killCounter.toFixed(0)), W - 10, H - 43)
 
   ctx.fillStyle = "white"
-  ctx.font = "11px monospace"
+  ctx.font = "11px 'Roboto Mono'"
   ctx.textAlign = "right"
   if (options.showPos) {
     ctx.fillText(locPlayer.pos, W - 120, 16);
@@ -142,7 +142,7 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
     ctx.fillText((camera.zoom / gl.canvas.width) / 2, W - 120, 46);
   }
 
-  if (optionsMenuOpen)
+  if (dialogueOpen)
     drawOptionsMenu(ctx);
 
   // ctx.fillText(["held", "down", "down", "unheld", "just unheld", "asdagrhjasgejhasg"][input.mouseState], W / 2, 100);

@@ -232,14 +232,14 @@ export default class Player {
     // ctx.font = "bold 0.5px Kumbh Sans, sans-serif"
     // ctx.textAlign = "center";
     // ctx.fillText(this.name, this.pos.x, this.pos.y - 1.5);
-    // ctx.font = "bold 0.5px monospace"
+    // ctx.font = "bold 0.5px 'Roboto Mono'"
 
 
 
     // ctx.fillStyle = "white";
     // ctx.shadowColor = "black";
     // ctx.shadowBlur = 3;
-    // ctx.font = "bold 0.5px monospace"
+    // ctx.font = "bold 0.5px 'Roboto Mono'"
     // ctx.textAlign = "center";
 
     // ctx.fillText(this.walkCycle, this.pos.x, this.pos.y + 1)

@@ -63,7 +63,7 @@ export const doPlayerPhysics = (player, dt) => { // FIXME: perfect edge intersec
         ctx.stroke();
 
         ctx.fillStyle = "black";
-        ctx.font = "0.5px monospace";
+        ctx.font = "0.5px 'Roboto Mono'";
         ctx.fillText(dp.toFixed(2), player.pos.x, player.pos.y);
         ctx.strokeStyle = "rgba(0,255,0,0.5)";
         ctx.beginPath()

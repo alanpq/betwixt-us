@@ -371,6 +371,8 @@ const drawVisibility = () => { // TODO: convex polygons?
 
 const draw = async (dt) => {
   // console.time("Draw")
+  // ctx.fillStyle = "blue"
+  // ctx.fillRect(W / 2 + Math.sin(time * 10) * 20, H / 2 + Math.cos(time * 10) * 20, 5, 5);
   // ctx.fillText(, 10, 40);
   ctx.setTransform(camera.zoom, 0, 0, camera.zoom, -camera.pos.x * camera.zoom, -camera.pos.y * camera.zoom);
 
