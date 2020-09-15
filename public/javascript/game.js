@@ -21,12 +21,7 @@ import { doPlayerPhysics } from './physics.js'
 import { lineIntersect } from './util/raycasts.js'
 import { hookPreload, preloadHooks } from './hooks.js'
 import { drawInteractables, addInteractable, interactables, drawHighlight } from './interactables.js'
-
-/** @type {SocketIO.Socket} */
-const socket = io('/' + sessionStorage.getItem('code'), {
-  autoConnect: false,
-});
-console.log(`Connecting to room '${sessionStorage.getItem('code')}'`);
+import { socket } from './socket.js'
 
 const urlParams = new URLSearchParams(window.location.search);
 
