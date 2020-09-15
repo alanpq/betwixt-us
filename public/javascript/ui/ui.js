@@ -1,5 +1,5 @@
 import { fillStrokedText } from '../util/util.js'
-import { gl, canvas, overlayCanvas, ctx, W, H } from '../canvas.js'
+import { gl, canvas, overlayCanvas, ctx, W, H, minAxis } from '../canvas.js'
 import * as button from './button.js'
 import { gameState, gameOptions } from '../state.js';
 import { camera } from '../render.js';
@@ -70,6 +70,22 @@ const drawOptions = () => {
   ctx.textBaseline = "middle";
 }
 
+const drawNumber = (value, x, y, inc = 0.25) => {
+  const buttonSize = minAxis * 0.05;
+  if (button.drawButton(ctx, "<", x, y, buttonSize, buttonSize, 0, 0.5, false, 0)) {
+    value -= inc
+  }
+  if (button.drawButton(ctx, ">", x + buttonSize + minAxis * 0.1, y, buttonSize, buttonSize, 0, 0.5, false, 0)) {
+    value += inc
+  }
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+  ctx.fillText(value.toFixed(2), x + buttonSize + minAxis * 0.05, y + 5);
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  return value;
+}
+
 const drawGameOptions = () => {
   input.UnEatMouse();
   ctx.fillStyle = "#111";
@@ -78,23 +94,33 @@ const drawGameOptions = () => {
   if (button.drawButton(ctx, "x", optionsBounds.x + optionsBounds.w - 10, optionsBounds.y + 10, 25, 25, 1, 0, false, 0))
     closeWindow();
 
-  let yOff = 50;
-  const size = optionsBounds.w * 0.075;
+  let yOff = 70;
+  const size = minAxis * 0.05;
   ctx.fillStyle = "white";
   ctx.textAlign = "left";
-  ctx.textBaseline = "hanging";
-  ctx.font = `${size * 0.75}px Kumbh Sans, sans-serif`
-  gameOptions.player_speed = button.drawCheckbox(ctx, gameOptions.player_speed, optionsBounds.x + 10, optionsBounds.y + yOff, size, 0, 0, false)
-  ctx.fillText("FPS Counter", optionsBounds.x + 20 + size, optionsBounds.y + yOff - 5 + size / 2);
+  ctx.textBaseline = "middle";
+  ctx.font = `${optionsBounds.w * 0.075 * 0.7}px Kumbh Sans, sans-serif`
+  button.clean();
+
+  gameOptions.player_speed = drawNumber(gameOptions.player_speed, optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 0.25)
+  ctx.fillText("Player Speed", optionsBounds.x + 20, optionsBounds.y + yOff);
   yOff += size + 5
 
-  options.showPos = button.drawCheckbox(ctx, options.showPos, optionsBounds.x + 10, optionsBounds.y + yOff, size, 0, 0, false)
-  ctx.fillText("Show position", optionsBounds.x + 20 + size, optionsBounds.y + yOff - 5 + size / 2);
+  gameOptions.crew_visibility = drawNumber(gameOptions.crew_visibility, optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 0.25)
+  ctx.fillText("Innocent Visibility", optionsBounds.x + 20, optionsBounds.y + yOff);
   yOff += size + 5
 
-  options.drawCollInfo = button.drawCheckbox(ctx, options.drawCollInfo, optionsBounds.x + 10, optionsBounds.y + yOff, size, 0, 0, false)
-  ctx.fillText("Draw collision info", optionsBounds.x + 20 + size, optionsBounds.y + yOff - 5 + size / 2);
+  gameOptions.kill_counter = drawNumber(gameOptions.kill_counter, optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 5)
+  ctx.fillText("Kill Counter", optionsBounds.x + 20, optionsBounds.y + yOff);
   yOff += size + 5
+
+  gameOptions.kill_range = drawNumber(gameOptions.kill_range, optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 5)
+  ctx.fillText("Kill Range", optionsBounds.x + 20, optionsBounds.y + yOff);
+  yOff += size + 5
+
+  if (button.dirty) {
+    console.log("Sending new game options to server...");
+  }
 
   ctx.textBaseline = "middle";
 }
