@@ -37,6 +37,7 @@ socket.on('connect', () => {
   })
 
   socket.on('kicked', (msg) => {
+    socket.disconnect();
     alert(`Kicked for reason:
   ${msg}`);
     window.location = "../";
