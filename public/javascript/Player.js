@@ -174,7 +174,7 @@ export default class Player {
       highlightShader,
       {
         u_lightPosition: [W / 2, H / 2],
-        u_radius: baseVisibility * camera.zoom,
+        u_radius: baseVisibility * gameOptions.crew_visibility * camera.zoom,
         u_colorTexture: maskSprite,
         u_frameOffset: this.moving ? this.walkCycle : 0,
         u_spritesPerRow: 5,
@@ -210,7 +210,7 @@ export default class Player {
       playerShader,
       {
         u_lightPosition: [W / 2, H / 2],
-        u_radius: baseVisibility * camera.zoom,
+        u_radius: baseVisibility * gameOptions.crew_visibility * camera.zoom,
         u_colorTexture: maskSprite,
         u_frameOffset: this.moving && !this.dead ? this.walkCycle : 0,
         u_spritesPerRow: 5,
