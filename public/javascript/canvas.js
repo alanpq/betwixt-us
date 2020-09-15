@@ -1,7 +1,8 @@
 import * as twgl from './lib/twgl-full.module.js'
+import { Vector } from './util/Vector.js'
 import { debounce } from './util/util.js'
 import { camera } from './render.js';
-import { baseVisibility, gameOptions, gameState } from './state.js'
+import { baseVisibility, gameOptions, locPlayer } from './state.js'
 
 // CANVASES
 
@@ -51,8 +52,12 @@ export const resizeCanvas = () => {
 }
 
 export const recalculateResVars = () => {
-  if (camera)
+  if (camera && locPlayer) {
     camera.zoom = (minAxis * 0.45) / Math.max(baseVisibility * gameOptions.crew_visibility, 8);
+    camera.W = W / camera.zoom;
+    camera.H = H / camera.zoom;
+    camera.pos = locPlayer.pos.subtract(new Vector(camera.W / 2, camera.H / 2))
+  }
 }
 resizeCanvas();
 

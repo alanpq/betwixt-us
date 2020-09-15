@@ -2,7 +2,7 @@ import * as twgl from './lib/twgl-full.module.js'
 import * as sprite from './sprite.js'
 import { ctx } from './canvas.js';
 import { AABB } from './util/util.js'
-import { locPlayer } from './game.js'
+import { locPlayer } from './state.js'
 import { options } from './ui/ui.js';
 
 // TODO: spacial segregation ;)

@@ -1,7 +1,7 @@
 import * as twgl from './lib/twgl-full.module.js'
 import Player from './Player.js'
 import * as input from './input.js'
-import { canvas, overlayCanvas, gl, ctx, W, H } from './canvas.js'
+import { canvas, overlayCanvas, gl, ctx, W, H, recalculateResVars } from './canvas.js'
 
 import { Vector } from './util/Vector.js'
 import { colors, lerp, mobileCheck, debounce } from './util/util.js'
@@ -12,7 +12,7 @@ import { solidProgramInfo, drawSprite, getSprite, drawTex, spriteShader } from '
 import * as joystick from './ui/joystick.js'
 import { m4, camera, loadShader } from './render.js'
 
-import { baseVisibility, gameOptions, gameState } from './state.js'
+import { baseVisibility, gameOptions, gameState, locPlayer, players, setLocPlayer } from './state.js'
 
 import { drawUI, tickUI, openWindow } from './ui/ui.js'
 // twgl.setDefaults({ attribPrefix: "a_" });
@@ -78,10 +78,11 @@ socket.on('connect', () => {
     for (let opt of Object.keys(options)) {
       gameOptions[opt] = options[opt];
     }
+    recalculateResVars();
   })
 
   socket.on('you', (newPlayer) => {
-    locPlayer = new Player(newPlayer);
+    setLocPlayer(new Player(newPlayer));
     locPlayer.isLocal = true;
     start();
   })
@@ -94,10 +95,6 @@ window.onfocus = document.onfocus = () => { window.focused = true; }
 
 
 
-/** @type {{[id: string] : Player}} */
-const players = {};
-/** @type {Player} */
-export let locPlayer = new Player();
 let playerCount = 1;
 
 export let time = 0;
@@ -122,8 +119,6 @@ const tick = (now) => {
   //   return;
   // }
 
-  camera.W = W / camera.zoom;
-  camera.H = H / camera.zoom;
   if (!locPlayer.dead) {
     gameState.killCounter -= dt;
     // TODO: better key shit
@@ -509,6 +504,7 @@ const start = async () => {
 
   interactables[laptop].disabled = !locPlayer.host
 
+  recalculateResVars();
   prev = performance.now()
   window.requestAnimationFrame(tick);
 }

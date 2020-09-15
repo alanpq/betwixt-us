@@ -1,3 +1,4 @@
+import Player from './Player.js'
 export const gameState = {
   _score: 0,
   set score(newScore) {
@@ -17,6 +18,15 @@ export const gameState = {
 
   killCounter: 1,
 
+}
+
+/** @type {{[id: string] : Player}} */
+export const players = {};
+/** @type {Player} */
+export let locPlayer;
+
+export const setLocPlayer = (pl) => {
+  locPlayer = pl;
 }
 
 export const baseVisibility = 8;
