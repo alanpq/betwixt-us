@@ -7,7 +7,7 @@ export const m4 = twgl.m4;
 const shaders = {};
 // let shadersLock = false;
 
-export const loadShader = async (path) => { // TODO: cache shaders
+export const loadShader = async (path) => {
   // console.log(shaders)
   // console.trace()
   if (shaders[path]) {
