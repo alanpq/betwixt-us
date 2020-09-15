@@ -14,7 +14,7 @@ import { m4, camera, loadShader } from './render.js'
 
 import { baseVisibility, gameOptions, gameState } from './state.js'
 
-import { drawUI, tickUI } from './ui/ui.js'
+import { drawUI, tickUI, openWindow } from './ui/ui.js'
 // twgl.setDefaults({ attribPrefix: "a_" });
 
 import { doPlayerPhysics } from './physics.js'
@@ -91,45 +91,7 @@ window.focused = true;
 window.onblur = document.onblur = () => { window.focused = false; }
 window.onfocus = document.onfocus = () => { window.focused = true; }
 
-addObject(gl, {
-  pos: new Vector(3, 0),
-  sprite: "box",
-  bounds: {
-    x: -1.7 / 2,
-    y: -0.25,
-    w: 1.7,
-    h: 1,
-  }
-});
 
-addObject(gl, {
-  pos: new Vector(4, 2),
-  sprite: "box",
-  bounds: {
-    x: -1.7 / 2,
-    y: -0.25,
-    w: 1.7,
-    h: 1,
-  }
-});
-
-addObject(gl, {
-  pos: new Vector(1, 7),
-  sprite: "box",
-  bounds: {
-    x: -1.7 / 2,
-    y: -0.25,
-    w: 1.7,
-    h: 1,
-  }
-});
-
-addInteractable({
-  pos: new Vector(-1, -1),
-  sprite: "laptop",
-}, (self) => {
-  console.log('interact!!')
-});
 
 /** @type {{[id: string] : Player}} */
 const players = {};
@@ -205,7 +167,7 @@ const tick = (now) => {
     closestInteractable = -1;
     for (let interactable of interactables) {
       const d = interactable.pos.subtract(locPlayer.pos).getSqrtMagnitude();
-      if (d < min) {
+      if (d < min && !interactable.disabled) {
         min = d;
         closestInteractable = interactable.id;
       }
@@ -497,12 +459,54 @@ const draw = async (dt) => {
   //   ctx.fillRect(intersect.x, intersect.y, 5, 5);
   // console.timeEnd("Draw")
 }
-const start = () => {
+const start = async () => {
   // TODO: maybe not use setInterval? not sure
   setInterval(() => {
     if (locPlayer.id)
       socket.emit('movement update', locPlayer.id, locPlayer.pos, locPlayer.velocity)
   }, 1000 / 20);
+
+  addObject(gl, {
+    pos: new Vector(3, 0),
+    sprite: "box",
+    bounds: {
+      x: -1.7 / 2,
+      y: -0.25,
+      w: 1.7,
+      h: 1,
+    }
+  });
+
+  addObject(gl, {
+    pos: new Vector(4, 2),
+    sprite: "box",
+    bounds: {
+      x: -1.7 / 2,
+      y: -0.25,
+      w: 1.7,
+      h: 1,
+    }
+  });
+
+  addObject(gl, {
+    pos: new Vector(1, 7),
+    sprite: "box",
+    bounds: {
+      x: -1.7 / 2,
+      y: -0.25,
+      w: 1.7,
+      h: 1,
+    }
+  });
+
+  const laptop = await addInteractable({
+    pos: new Vector(-1, -1),
+    sprite: "laptop",
+  }, (self) => {
+    openWindow("gameOptions")
+  });
+
+  interactables[laptop].disabled = !locPlayer.host
 
   prev = performance.now()
   window.requestAnimationFrame(tick);

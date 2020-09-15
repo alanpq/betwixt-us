@@ -12,6 +12,7 @@ import { loadShader, camera } from './render.js'
  * @property {Vector} pos
  * @property {string} sprite
  * @property {any} interactCB
+ * @property {boolean} disabled
  */
 
 /** @type {Interactable[]} */
@@ -32,7 +33,7 @@ export const addInteractable = async (interactable, cb) => {
     interactable.id = interactables.length;
     interactable.interactCB = cb;
     interactables.push(interactable);
-    return interactable;
+    return interactable.id;
 }
 
 export const drawInteractables = () => {

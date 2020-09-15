@@ -1,7 +1,7 @@
 import { fillStrokedText } from '../util/util.js'
-import { gl, canvas, overlayCanvas, W, H } from '../canvas.js'
+import { gl, canvas, overlayCanvas, ctx, W, H } from '../canvas.js'
 import * as button from './button.js'
-import { gameState } from '../state.js';
+import { gameState, gameOptions } from '../state.js';
 import { camera } from '../render.js';
 import * as input from '../input.js'
 
@@ -10,6 +10,7 @@ export const options = {
   showPos: true,
   drawCollInfo: false,
 }
+
 
 
 // Framerate Variables
@@ -21,8 +22,8 @@ let frameTimeSamples = new Array(99);
 const frameTimeSampleCount = 100;
 
 export const tickUI = (prev, now) => {
-  if (options.fpsDisplay > 0) {
-    let dt = now - prev
+  if (options.fpsDisplay) {
+    const dt = now - prev
     frameTimeSum -= frameTimeSamples[frameTimeI] || 0;
     frameTimeSamples[frameTimeI] = dt;
     frameTimeSum += dt;
@@ -40,17 +41,13 @@ let optionsBounds = {
 optionsBounds.x = W / 2 - optionsBounds.w / 2;
 optionsBounds.y = H / 2 - optionsBounds.h / 2;
 
-/**
- * 
- * @param {CanvasRenderingContext2D} ctx 
- */
-const drawOptionsMenu = (ctx) => {
+const drawOptions = () => {
   input.UnEatMouse();
   ctx.fillStyle = "#111";
   ctx.fillRect(optionsBounds.x, optionsBounds.y, optionsBounds.w, optionsBounds.h)
 
   if (button.drawButton(ctx, "x", optionsBounds.x + optionsBounds.w - 10, optionsBounds.y + 10, 25, 25, 1, 0, false, 0))
-    dialogueOpen = false;
+    closeWindow();
 
   let yOff = 50;
   const size = optionsBounds.w * 0.075;
@@ -73,11 +70,63 @@ const drawOptionsMenu = (ctx) => {
   ctx.textBaseline = "middle";
 }
 
+const drawGameOptions = () => {
+  input.UnEatMouse();
+  ctx.fillStyle = "#111";
+  ctx.fillRect(optionsBounds.x, optionsBounds.y, optionsBounds.w, optionsBounds.h)
+
+  if (button.drawButton(ctx, "x", optionsBounds.x + optionsBounds.w - 10, optionsBounds.y + 10, 25, 25, 1, 0, false, 0))
+    closeWindow();
+
+  let yOff = 50;
+  const size = optionsBounds.w * 0.075;
+  ctx.fillStyle = "white";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "hanging";
+  ctx.font = `${size * 0.75}px Kumbh Sans, sans-serif`
+  gameOptions.player_speed = button.drawCheckbox(ctx, gameOptions.player_speed, optionsBounds.x + 10, optionsBounds.y + yOff, size, 0, 0, false)
+  ctx.fillText("FPS Counter", optionsBounds.x + 20 + size, optionsBounds.y + yOff - 5 + size / 2);
+  yOff += size + 5
+
+  options.showPos = button.drawCheckbox(ctx, options.showPos, optionsBounds.x + 10, optionsBounds.y + yOff, size, 0, 0, false)
+  ctx.fillText("Show position", optionsBounds.x + 20 + size, optionsBounds.y + yOff - 5 + size / 2);
+  yOff += size + 5
+
+  options.drawCollInfo = button.drawCheckbox(ctx, options.drawCollInfo, optionsBounds.x + 10, optionsBounds.y + yOff, size, 0, 0, false)
+  ctx.fillText("Draw collision info", optionsBounds.x + 20 + size, optionsBounds.y + yOff - 5 + size / 2);
+  yOff += size + 5
+
+  ctx.textBaseline = "middle";
+}
+
+
+/**
+ * @typedef {"options" | "gameOptions"} WindowType
+ */
+const windows = {
+  options: drawOptions,
+  gameOptions: drawGameOptions
+}
+
+let curWindow = null;
+
+/**
+ * 
+ * @param {WindowType} window 
+ */
+export const openWindow = (window) => {
+  curWindow = window;
+}
+
+export const closeWindow = () => {
+  curWindow = null;
+}
+
 
 export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-  if (input.mousePos.x >= optionsBounds.x && input.mousePos.x <= optionsBounds.x + optionsBounds.w && input.mousePos.y >= optionsBounds.y && input.mousePos.y <= optionsBounds.y + optionsBounds.h) {
+  if (curWindow) {
     input.EatMouse(); // TODO: better options menu
   }
 
@@ -126,7 +175,7 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
   }
 
   if (button.drawButton(ctx, "Options", W - 10, 10, 100, 100, 1, 0, false))
-    dialogueOpen = !dialogueOpen;
+    openWindow("options")
 
   ctx.textAlign = "right";
   ctx.font = "30px Kumbh Sans, sans-serif";
@@ -142,8 +191,8 @@ export const drawUI = (ctx, dt, socket, playerCount, locPlayer) => {
     ctx.fillText((camera.zoom / gl.canvas.width) / 2, W - 120, 46);
   }
 
-  if (dialogueOpen)
-    drawOptionsMenu(ctx);
+  if (curWindow)
+    windows[curWindow]();
 
   // ctx.fillText(["held", "down", "down", "unheld", "just unheld", "asdagrhjasgejhasg"][input.mouseState], W / 2, 100);
 
