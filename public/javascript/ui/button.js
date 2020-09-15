@@ -10,7 +10,9 @@ export const style = {
 }
 
 export let dirty = false;
-
+export const clean = () => {
+  dirty = false;
+}
 
 /**
  * Draws a button at a specified point. Colours can be customized with style.fill, style.hover, etc. Returns true if the button has been pressed
