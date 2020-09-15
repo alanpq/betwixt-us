@@ -70,17 +70,17 @@ const drawOptions = () => {
   ctx.textBaseline = "middle";
 }
 
-const drawNumber = (value, x, y, inc = 0.25) => {
+const drawNumber = (value, x, y, inc = 0.25, customString = null) => {
   const buttonSize = minAxis * 0.05;
+  ctx.textBaseline = "middle";
+  ctx.textAlign = "center";
+  ctx.fillText(customString || value.toFixed(2), x + buttonSize + minAxis * 0.05, y + 5);
   if (button.drawButton(ctx, "<", x, y, buttonSize, buttonSize, 0, 0.5, false, 0)) {
     value -= inc
   }
   if (button.drawButton(ctx, ">", x + buttonSize + minAxis * 0.1, y, buttonSize, buttonSize, 0, 0.5, false, 0)) {
     value += inc
   }
-  ctx.textBaseline = "middle";
-  ctx.textAlign = "center";
-  ctx.fillText(value.toFixed(2), x + buttonSize + minAxis * 0.05, y + 5);
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   return value;
@@ -110,7 +110,7 @@ const drawGameOptions = () => {
   ctx.fillText("Innocent Visibility", optionsBounds.x + 20, optionsBounds.y + yOff);
   yOff += size + 5
 
-  gameOptions.kill_counter = drawNumber(gameOptions.kill_counter, optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 5)
+  gameOptions.kill_counter = drawNumber(Math.max(5, gameOptions.kill_counter), optionsBounds.x + 10 + optionsBounds.w / 2, optionsBounds.y + yOff, 5, gameOptions.kill_counter + ' sec')
   ctx.fillText("Kill Counter", optionsBounds.x + 20, optionsBounds.y + yOff);
   yOff += size + 5
 
