@@ -9,6 +9,7 @@ export const style = {
   active: "#545454",
 }
 
+export let dirty = false;
 
 
 /**
@@ -34,8 +35,10 @@ export const drawButton = (ctx, text, x, y, w, h, anchorX = 0, anchorY = 0, disa
     ctx.fillStyle = style.disabledBg;
   } else if (mousePos.x >= bb.x && mousePos.x <= bb.x + w && mousePos.y >= bb.y && mousePos.y <= bb.y + h) {
     ctx.fillStyle = GetLeftMouse(true) ? style.active : style.hover;
-    if (GetLeftMouseUp(true))
+    if (GetLeftMouseUp(true)) {
       clicked = true;
+      dirty = true;
+    }
   }
 
   ctx.textAlign = "center";
@@ -69,8 +72,10 @@ export const drawImgButton = (ctx, img, x, y, size, anchorX = 0, anchorY = 0, di
     ctx.fillStyle = style.disabledBg;
   } else if (mousePos.x >= bb.x && mousePos.x <= bb.x + w && mousePos.y >= bb.y && mousePos.y <= bb.y + h) {
     ctx.fillStyle = GetLeftMouse(true) ? style.active : style.hover;
-    if (GetLeftMouseUp(true))
+    if (GetLeftMouseUp(true)) {
       clicked = true;
+      dirty = true;
+    }
   }
 
   ctx.textAlign = "center";
@@ -104,8 +109,10 @@ export const drawCheckbox = (ctx, checked, x, y, size, anchorX = 0, anchorY = 0,
     ctx.fillStyle = style.disabledBg;
   } else if (mousePos.x >= bb.x && mousePos.x <= bb.x + size && mousePos.y >= bb.y && mousePos.y <= bb.y + size) {
     ctx.fillStyle = GetLeftMouse(true) ? style.active : style.hover;
-    if (GetLeftMouseUp(true))
+    if (GetLeftMouseUp(true)) {
+      dirty = true;
       checked = !checked;
+    }
   }
 
   ctx.fillRect(bb.x, bb.y, size, size);
