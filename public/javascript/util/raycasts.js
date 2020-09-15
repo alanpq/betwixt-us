@@ -101,7 +101,7 @@ export const boxIntersect = (ray, pos, bounds) => { // TODO: maybe implement coh
   let minPoint = -1;
   sides.forEach((side, i) => {
     if (!side) return
-    let dist = rA.subtract(side).getSqrtMagnitude();
+    let dist = rA.subtract(side).getSqrMagnitude();
     if (dist < minDist) {
       minPoint = i;
       minDist = dist;
