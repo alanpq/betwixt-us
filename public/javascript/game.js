@@ -183,7 +183,7 @@ const tick = (now) => {
     }
 
     if (closestInteractable != -1 && input.getKeyCodeDown(69)) {
-      interactables[closestInteractable].interactCB(interactables[closestInteractable]);
+      interactables[closestInteractable].interactCB(closestInteractable);
     }
 
     // console.log(input.keyState[65]);

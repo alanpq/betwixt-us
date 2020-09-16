@@ -147,6 +147,11 @@ export const openWindow = (window) => {
   curWindow = window;
 }
 
+export const openCustomWindow = (window) => {
+  curWindow = "custom"
+  windows.custom = window;
+}
+
 export const closeWindow = () => {
   curWindow = null;
 }
