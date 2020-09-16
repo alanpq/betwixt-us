@@ -175,7 +175,7 @@ const tick = (now) => {
     min = gameOptions.interactable_range;
     closestInteractable = -1;
     for (let interactable of interactables) {
-      const d = interactable.pos.subtract(locPlayer.pos).getSqrtMagnitude();
+      const d = interactable.pos.subtract(locPlayer.pos).getSqrMagnitude();
       if (d < min && !interactable.disabled) {
         min = d;
         closestInteractable = interactable.id;
